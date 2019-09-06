@@ -1,0 +1,30 @@
+body {font-size:12pt;font-family: Candara,Arial;color:#003399}
+
+h2 {font-size: 16pt}
+
+h3 {font-size: 14pt}
+
+#wrapper{margin:auto; background-color: #ADD8E6; width:40em; padding:5px}
+
+#header{height:75px; border-bottom:dotted #B2BCC6 2px}
+
+#header img{height: 70px; float:left; padding-right:10px}
+
+#header h2{padding-top: 20px}
+
+#nav{float:left; width: 16em;}
+
+#container{float:right; width:23 em}
+
+#nav li{padding-top: 20px}
+
+.clearme{clear:both}
+
+#footer{border-top: dooted #B2BCC6 2px} 
+
+.snippet{border-left:solid #003399 1px;padding-left: 10px
+
+.myquote{font-style:italic}
+
+
+
