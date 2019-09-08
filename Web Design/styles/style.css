@@ -8,21 +8,21 @@ h3 {font-size: 14pt}
 
 #header{height:75px; border-bottom:dotted #B2BCC6 2px}
 
-#header img{height: 70px; float:left; padding-right:10px}
+#header img{height: 120px; float:left; padding-right:10px}
 
 #header h2{padding-top: 20px}
 
-#nav{float:left; width: 16em;}
+#nav{float:left; width: 16em}
 
-#container{float:right; width:23 em}
+#container{float:right; width: 23em}
 
 #nav li{padding-top: 20px}
 
-.clearme{clear:both}
+.clearme{clear: both}
 
-#footer{border-top: dooted #B2BCC6 2px} 
+#footer{float:bottom;border-top: dotted #B2BCC6 2px} 
 
-.snippet{border-left:solid #003399 1px;padding-left: 10px
+.snippet{border-left:solid #003399 1px;padding-left: 20px
 
 .myquote{font-style:italic}
 
