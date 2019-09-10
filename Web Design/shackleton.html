@@ -2,6 +2,15 @@
 <head>
 <title> Ernest Shackleton </title>
 <link href = "styles/style.css" rel="stylesheet" type="text/css">
+<script>
+function chk_ans()
+{
+	my_elem = document.getElementById('ans');
+	my_elem.innerHTML = '800 nautical miles';
+	my_elem.style.color = 'red';
+}
+</script>
+
 </head>
 
 <body>
@@ -24,16 +33,29 @@
 <h3> Shackleton's Life </h3>
 
 <div id="container">
-<div class="clearme"></div>
+
 <p class ="snippet">
-<a href="https://en.wikipedia.org/wiki/Ernest_Shackleton" target ="_blank"> Sir Ernest Shackleton </a> was an Anglo-Irish Antarctic explorer and is famous, principally, for leading the Imperial Trans-Antartic (Endurance) Expedition of 1914-16.
+<a href="https://en.wikipedia.org/wiki/Ernest_Shackleton" target ="_blank"> Sir Ernest Shackleton </a> was an
+ Anglo-Irish Antarctic explorer and is famous, principally, for leading the Imperial Trans-Antartic (Endurance) 
+Expedition of 1914-16.
 </p>
 <p class ="snippet">
-He was one of the principal figures of the period known as the Heroic Age of Antartic Exploration. Educated at Dulwich College and having ignored his father's wishes that he become a doctor he joined the merchant navy. Of many quotes one of his most famous is,<span class="myquote"> "Difficulties are just things to overcome, after all."</span> 
-</p>
+He was one of the principal figures of the period known as the Heroic Age of Antartic Exploration.
+ Educated at Dulwich College and having ignored his father's wishes that he become a doctor he joined the merchant 
+navy. Of many quotes one of his most famous is,<span class="myquote">Difficulties are just things to overcome, 
+after all.</span> </p>
 <p = class="snippet">
-During his life he made three trips to the Antarctic. As well as climbing Mount Erebus he made many important scientific discoveries. On his fourth expedition to circumnavigate the Antartic he died of a heart attack. He was buried on the Island of South Georgia.
+During his life he made three trips to the Antarctic. As well as climbing Mount Erebus he made many important
+ scientific discoveries. On his fourth expedition to circumnavigate the Antartic he died of a heart attack. 
+He was buried on the Island of South Georgia.
 </p>
+</div>
+<div class="clearme"></div>
+<div id="quiz">
+<h3> Quiz </h3>
+<p>How far (according to Shackleton's wikipedia page) is it from Elephant Island
+to South Georgia in Nautical Miles?<span class="myquote" id="ans"><span/></p>
+<p> <button onCLick='chk_ans()'>Check Answer</button></p>
 </div>
 <div id="footer">
 Thank you for visiting my webpage
