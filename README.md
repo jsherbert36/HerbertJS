@@ -1,2 +1,2 @@
-# Year-12
+# HerbertJS
 Year 12 Computer Science Work
