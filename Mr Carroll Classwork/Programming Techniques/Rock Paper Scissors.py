@@ -29,7 +29,7 @@ while userinput != -1:
             userinput = -1
     else:
         print('invalid input')
-exit()
+
         
 
 
