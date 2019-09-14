@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 table,answer = -1,'C'
 def entertable():
     global table,Rows
@@ -26,3 +27,20 @@ if answer == 'Yes':
 else:
     entertable()
 
+=======
+table,answer = -1,'N'
+while (table < 1 or table > 20):
+    print("Enter which times table you want from 1 to 20")
+    try:
+        table = int(input())
+    except valueerror:
+        print('Please enter an integer next time')
+    print('Enter how many rows you want:')
+    try:
+        rows = int(input())
+    except valueerror:
+        print('Please enter an integer next time')
+#endwhile
+print("You entered the ",table," for ",rows," rows")
+[print(i*int(table)) for i in range(int(rows))]
+>>>>>>> 2cce926b124b281edd9b8c34d98353b513e8ed36
