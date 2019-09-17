@@ -1,9 +1,11 @@
-<<<<<<< HEAD
+#<<<<<<< HEAD
+### SRC - Where has the line above come from?
 table,answer = -1,'C'
+Rows = -1 ### SRC - I added this line
 def entertable():
-    global table,Rows
+    global table,Rows  ### SRC - No globals please!!!
     while table != -1:
-        print("Enter which times table you want from 1 to 20")
+        print("Enter which times table you want from 1 to 20") ### SRC - you can put the output text in your input statement
         table = input()
         if table.isdigit() and rows not in range(1,21):
             table = int(table)
@@ -27,7 +29,7 @@ if answer == 'Yes':
 else:
     entertable()
 
-=======
+#=======
 table,answer = -1,'N'
 while (table < 1 or table > 20):
     print("Enter which times table you want from 1 to 20")
@@ -42,5 +44,7 @@ while (table < 1 or table > 20):
         print('Please enter an integer next time')
 #endwhile
 print("You entered the ",table," for ",rows," rows")
-[print(i*int(table)) for i in range(int(rows))]
->>>>>>> 2cce926b124b281edd9b8c34d98353b513e8ed36
+[print(i*int(table)) for i in range(int(rows))]  ### Can you do this as a standard for loop please.
+
+
+#>>>>>>> 2cce926b124b281edd9b8c34d98353b513e8ed36
