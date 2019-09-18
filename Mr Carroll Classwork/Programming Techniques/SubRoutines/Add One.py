@@ -14,8 +14,11 @@ def append_s(name):
     print (name)
 #end procedure
 
+print(add_one(num))
+print(num, "\n")
+
 print(add_s(name))
-print(name)
+print(name, "\n")
 
 append_s(name_list)
 print(name_list)
