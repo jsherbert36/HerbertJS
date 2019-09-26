@@ -19,21 +19,6 @@ def Factorial2(Num):
     #endif
 #end function 
 
-
-# procedure to calculate factorials
-def factorial3(Num):
-    def fact(Num):
-        if Num == 0:
-            return 1
-        else:
-            return Num * Factorial1(Num - 1)
-        #endif
-    #endprocedure
-    print (fact(Num))
-#end procedure
-
-
 Number = int(input('Enter a number: '))
 print(Factorial1(Number))
 print(Factorial2(Number))
-factorial3(Number)
