@@ -1,7 +1,7 @@
 def read_text():
     file = input("Please enter the input file name i.e input.txt: ")
     f = open(file,"rt")
-    return (f.read()).upper()
+    return (f.read())
     f.close()
 #endprocedure
 def output_text(String):
