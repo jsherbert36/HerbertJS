@@ -17,8 +17,8 @@ def result(WinOrLose):
 while userinput != -1:
     print('============================================================================') ### SRC - Do you need these print statements? could you have used the input below
     print('NEW ROUND: Enter rock, paper or scissors. Enter finish to end the game.')
-    userinput = input() ### SRC - do you need str here?
-    comp = randint(0,2)  ### SRC - meaningful variable names please!!!
+    userinput = input()
+    comp = randint(0,2)  
     if userinput in choice:
         i = choice.index(userinput)
         if i == comp:
