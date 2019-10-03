@@ -20,8 +20,13 @@ num = int(input("Please input a number: "))
 type = input("Enter recursive or iterative: ")
 
 if type == 'recursive':
+    startTime = time.time()
     print(fib_recursive(num))
-elif type == 'iterative':  
-    [print(i,end=' ') for i in fib_iterative(num)]
+    print(time.time() - startTime)
+elif type == 'iterative':
+    startTime = time.time()
+    Number = fib_iterative(num)
+    print(Number[-1])
+    print(time.time() - startTime)
 else:
     print("Invalid input")
