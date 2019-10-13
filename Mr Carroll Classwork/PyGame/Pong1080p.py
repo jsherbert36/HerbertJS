@@ -1,6 +1,6 @@
 import pygame
 import random
-
+import sys
 
 def Menu1():
     choice = False
@@ -440,7 +440,7 @@ clock = pygame.time.Clock()
 
 # -- Blank Screen
 size = (1920,1080)
-screen = pygame.display.set_mode(size,pygame.RESIZABLE)
+screen = pygame.display.set_mode(size,pygame.FULLSCREEN)
 pygame.display.set_caption("Pong")
 
 restart = False
@@ -457,7 +457,7 @@ while not restart:
         elif difficulty == 'Medium':
             gameplay(9,150,mode,8,120)
         elif difficulty == 'Hard':
-            gameplay(12,150,mode,11,130)
+            gameplay(13.5,150,mode,12,130)
         #end if
     #end if
 #endwhile

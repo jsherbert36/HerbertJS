@@ -416,11 +416,11 @@ def gameplay(speed,paddle_height,mode,comp_speed,refresh):
             font2 = pygame.font.Font('freesansbold.ttf', 50) 
             Single1 = font2.render(str(score1), True, WHITE)
             Single1Rect = Single1.get_rect()
-            Single1Rect.center = (80, 80) 
+            Single1Rect.center = (100, 80) 
             screen.blit(Single1, Single1Rect)
             Single2 = font2.render(str(score2), True, WHITE)
             Single2Rect = Single2.get_rect()
-            Single2Rect.center = (1200, 80) 
+            Single2Rect.center = (1180, 80) 
             screen.blit(Single2, Single2Rect)
 
             pygame.draw.rect(screen, WHITE, (right_x, right_y, 24, paddle_height))
@@ -453,11 +453,11 @@ while not restart:
         difficulty = Menu2()
         countdown(3)
         if difficulty == 'Easy':
-            gameplay(7,170,mode,5,100)
+            gameplay(7,160,mode,5,100)
         elif difficulty == 'Medium':
-            gameplay(9,130,mode,8,120)
+            gameplay(9,125,mode,8,120)
         elif difficulty == 'Hard':
-            gameplay(12,130,mode,11,130)
+            gameplay(12,125,mode,11,130)
         #end if
     #end if
 #endwhile
