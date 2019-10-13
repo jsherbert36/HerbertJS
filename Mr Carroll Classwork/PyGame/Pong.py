@@ -1,6 +1,6 @@
 import pygame
 import random
-import sys
+
 
 def Menu1():
     choice = False
@@ -440,7 +440,7 @@ clock = pygame.time.Clock()
 
 # -- Blank Screen
 size = (1920,1080)
-screen = pygame.display.set_mode(size,pygame.FULLSCREEN)
+screen = pygame.display.set_mode(size,pygame.RESIZABLE)
 pygame.display.set_caption("Pong")
 
 restart = False
