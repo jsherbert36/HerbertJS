@@ -4,14 +4,16 @@ import sys
 
 def Menu1():
     choice = False
-    font = pygame.font.Font('freesansbold.ttf', 90) 
-    font2 = pygame.font.Font('freesansbold.ttf',50)
-    font3 = pygame.font.Font('freesansbold.ttf',20)
+    font = pygame.font.Font('freesansbold.ttf', size[1]//8) 
+    font2 = pygame.font.Font('freesansbold.ttf',int(size[1]//14.4))
+    font3 = pygame.font.Font('freesansbold.ttf',size[1]//36)
     BLACK = (0,0,0)
     WHITE = (255,255,255)
     RED = (204,0,0)
     SingleColour = WHITE
     MultiColour = WHITE
+    ScoreColour = WHITE
+    CircleSize = 15
     global game_over
     game_over = False
     circle_x = [90,200,600,1200,1100] 
@@ -24,12 +26,12 @@ def Menu1():
         screen.fill(BLACK) 
         Pong = font.render('PONG!', True, WHITE)
         PongRect = Pong.get_rect()
-        PongRect.center = (size[0] // 2, 240) 
+        PongRect.center = (size[0] // 2, size[1] // 3) 
         screen.blit(Pong, PongRect) 
         mouse = pygame.mouse.get_pos()      
         Single = font2.render('SINGLEPLAYER', True, SingleColour)
         SingleRect = Single.get_rect()
-        SingleRect.center = (size[0] // 2, 350) 
+        SingleRect.center = (size[0] // 2, size[1] // 2) 
         screen.blit(Single, SingleRect) 
         if mouse[0]in range(SingleRect.x,SingleRect.x + SingleRect.width) and  mouse[1] in range(SingleRect.y,SingleRect.y + SingleRect.height):
             SingleColour = RED
@@ -38,31 +40,40 @@ def Menu1():
         #endif
         Multi = font2.render('MULTIPLAYER', True, MultiColour)
         MultiRect = Multi.get_rect()
-        MultiRect.center = (size[0] // 2, 420) 
+        MultiRect.center = (size[0] // 2, int(size[1] // 1.7)) 
         screen.blit(Multi, MultiRect) 
         if mouse[0]in range(MultiRect.x,MultiRect.x + MultiRect.width) and  mouse[1] in range(MultiRect.y,MultiRect.y + MultiRect.height):
             MultiColour = RED
         else:
             MultiColour = WHITE
         #endif
+        Score = font2.render('SCOREBOARD', True, ScoreColour)
+        ScoreRect = Score.get_rect()
+        ScoreRect.center = (size[0] // 2, int(size[1] // 1.46)) 
+        screen.blit(Score, ScoreRect) 
+        if mouse[0]in range(ScoreRect.x,ScoreRect.x + ScoreRect.width) and  mouse[1] in range(ScoreRect.y,ScoreRect.y + ScoreRect.height):
+            ScoreColour = RED
+        else:
+            ScoreColour = WHITE
+        #endif
         for i in range(5):
             circle_x[i] += round(direction_x[i])
             circle_y[i] += round(direction_y[i])
-            if circle_y[i] > 705:
+            if circle_y[i] > size[1] - CircleSize:
                 direction_y[i] *= -1
-            elif circle_y[i] < 15:
+            elif circle_y[i] < CircleSize:
                 direction_y[i] *= -1
-            elif circle_x[i] < 15:
+            elif circle_x[i] < CircleSize:
                 direction_x[i] *= -1
-            elif circle_x[i] > 1265:
+            elif circle_x[i] > size[0] - CircleSize:
                 direction_x[i] *= -1
-            pygame.draw.circle(screen, WHITE, (circle_x[i],circle_y[i]), 15)
+            pygame.draw.circle(screen, WHITE, (circle_x[i],circle_y[i]), CircleSize)
             #end if
         #next i
 
         Message = font3.render('PRESS ESC TO EXIT', True, WHITE)
         MessageRect = Message.get_rect()
-        MessageRect.center = (size[0] // 2, 600) 
+        MessageRect.center = (size[0] // 2, int(size[1]//1.2)) 
         screen.blit(Message, MessageRect) 
         pygame.display.flip()
 
@@ -84,6 +95,9 @@ def Menu1():
                     elif mouse[0]in range(MultiRect.x,MultiRect.x + MultiRect.width) and  mouse[1] in range(MultiRect.y,MultiRect.y + MultiRect.height):
                         choice = True
                         return 'multi'
+                    elif mouse[0]in range(ScoreRect.x,ScoreRect.x + ScoreRect.width) and  mouse[1] in range(ScoreRect.y,ScoreRect.y + ScoreRect.height):
+                        choice = True
+                        return 'score'
                     #endif
                 #end if
         #next event      
@@ -220,7 +234,10 @@ def countdown(usercount):
             clock.tick(60)
     #endwhile
 #end procedure
-
+def outputhighscore(num):
+    f = open('highscore.txt','wt')
+    f.write(str(num))
+    f.close()
 def gameplay(speed,paddle_height,mode,comp_speed,refresh):
     #initialise variables
     left_x = 30
@@ -239,6 +256,10 @@ def gameplay(speed,paddle_height,mode,comp_speed,refresh):
     score2 = 0
     font = pygame.font.Font('freesansbold.ttf', 100)
     font2 = pygame.font.Font('freesansbold.ttf',80)
+    font3 = pygame.font.Font('freesansbold.ttf',40)
+    f = open('highscore.txt','rt')
+    highscore = int(f.read())
+    f.close
     while not game_over:
         if game_end:
                 clock.tick(1)   
@@ -253,6 +274,12 @@ def gameplay(speed,paddle_height,mode,comp_speed,refresh):
             direction_x *= -1
         #endif
         circle_y = random.randint(5,700)
+        if score1 > highscore:
+            highscore = score1
+            outputhighscore(highscore)
+        elif score2 > highscore:
+            highscore = score2
+            outputhighscore(highscore)
         while not game_over and not game_end:
             # -- User input and controls
             for event in pygame.event.get():
@@ -261,6 +288,10 @@ def gameplay(speed,paddle_height,mode,comp_speed,refresh):
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         game_over = True
+                    elif event.key == pygame.K_p:
+                        score2 += 1
+                    elif event.key == pygame.K_t:
+                        score1 += 1
                     #endif
                 #endif
             #Next event
@@ -322,9 +353,9 @@ def gameplay(speed,paddle_height,mode,comp_speed,refresh):
             #endif
             if mode == 'multi':
                 if keys[pygame.K_w]:
-                    left_y = left_y - 11
+                    left_y = left_y - 13
                 elif keys[pygame.K_s]:
-                    left_y = left_y + 11
+                    left_y = left_y + 13
                 #endif
             elif mode == 'single' or mode == 'special':
                 if circle_x < 640:
@@ -343,9 +374,9 @@ def gameplay(speed,paddle_height,mode,comp_speed,refresh):
             #endif
             if mode == 'single' or mode == 'multi':
                 if keys[pygame.K_UP]:
-                    right_y = right_y - 11
+                    right_y = right_y - 13
                 elif keys[pygame.K_DOWN]:
-                    right_y = right_y + 11
+                    right_y = right_y + 13
                 #endif
             elif mode == 'special':
                 if circle_x > 640:
@@ -413,6 +444,7 @@ def gameplay(speed,paddle_height,mode,comp_speed,refresh):
                 game_end = True
                 score1 += 1
             #endif
+            
             font2 = pygame.font.Font('freesansbold.ttf', 50) 
             Single1 = font2.render(str(score1), True, WHITE)
             Single1Rect = Single1.get_rect()
@@ -422,6 +454,10 @@ def gameplay(speed,paddle_height,mode,comp_speed,refresh):
             Single2Rect = Single2.get_rect()
             Single2Rect.center = (1180, 80) 
             screen.blit(Single2, Single2Rect)
+            Single3 = font3.render(str(highscore), True, WHITE)
+            Single3Rect = Single3.get_rect()
+            Single3Rect.center = (size[0]//2, 80) 
+            screen.blit(Single3, Single3Rect)
 
             pygame.draw.rect(screen, WHITE, (right_x, right_y, 24, paddle_height))
             pygame.draw.rect(screen, WHITE, (left_x, left_y, 24, paddle_height))
