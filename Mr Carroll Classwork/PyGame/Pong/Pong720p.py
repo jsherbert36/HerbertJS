@@ -200,6 +200,7 @@ def Menu2():
     #endwhile
 #end function
 
+    
 def ScoreBoard():
     choice = False
     font = pygame.font.Font('freesansbold.ttf', size[0]//20) 
@@ -238,7 +239,7 @@ def ScoreBoard():
         s.close
         Rally = font2.render('LONGEST RALLY: ' + highrally, True, WHITE)
         RallyRect = Rally.get_rect()
-        RallyRect.topleft = (ScoreRect.left, ScoreRect.bottom + 50) 
+        RallyRect.topleft = (ScoreRect.left, ScoreRect.bottom + size[1]//30) 
         screen.blit(Rally, RallyRect) 
 
         p = open('mostrounds.txt','rt')
@@ -246,7 +247,7 @@ def ScoreBoard():
         p.close
         Round = font2.render('MOST ROUNDS: ' + mostrounds, True, WHITE)
         RoundRect = Round.get_rect()
-        RoundRect.topleft = (ScoreRect.left, RallyRect.bottom + 50) 
+        RoundRect.topleft = (ScoreRect.left, RallyRect.bottom + size[1]//30) 
         screen.blit(Round, RoundRect) 
 
         Back = font3.render('BACK', True, BackColour)
@@ -610,8 +611,8 @@ clock = pygame.time.Clock()
 
 # -- Blank Screen
 infoObject = pygame.display.Info()
-size2 = (infoObject.current_w, infoObject.current_h)
-size = (1280,720)
+size = (infoObject.current_w, infoObject.current_h)
+size2 = (1280,720)
 screen = pygame.display.set_mode(size,pygame.FULLSCREEN)
 
 pygame.display.set_caption("Pong")
