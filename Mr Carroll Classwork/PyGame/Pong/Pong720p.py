@@ -386,7 +386,7 @@ def gameplay(speed,paddle_height,mode,comp_speed,refresh):
             outputscore(highscore,'highscore.txt')
         elif score2 > highscore:
             highscore = score2
-            outputhighscore(highscore,'highscore.txt')
+            outputscore(highscore,'highscore.txt')
         s = open('highestrally.txt','rt')
         highrally = int(s.read())
         s.close

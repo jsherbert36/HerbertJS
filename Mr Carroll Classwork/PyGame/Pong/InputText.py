@@ -14,28 +14,40 @@ def InputName():
     CenterX = size[0]//2
     global game_over
     game_over = False
-    Text = 'TEST'
+    Text = '_______'
     Active = False
     BackWidth = 10
     BackHeight = 10
+    BOX_X = 30
+    BOX_Y = 40
+    TextColour = WHITE
     while not game_over and not choice:
         screen.fill(BLACK) 
         
-        mouse = pygame.mouse.get_pos()      
-        BOXRect = pygame.draw.rect(screen, BOXColour, (CenterX,size[1]//2, BackWidth, BackHeight))
-        BOXRect.center = (CenterX,size[1]//2)
-        Score = font2.render(Text, True, WHITE)
+        mouse = pygame.mouse.get_pos()
+        Player1 = font2.render('PLAYER 1: ',True,WHITE)
+        Player1Rect = Player1.get_rect()
+        Player1Rect.x = 300
+        Player1Rect.y = 300
+        screen.blit(Player1,Player1Rect)
+        BOXRect = pygame.draw.rect(screen, BOXColour, (BOX_X,BOX_Y, BackWidth, BackHeight))
+        Score = font2.render(Text, True, TextColour)
         ScoreRect = Score.get_rect()
-        ScoreRect.center = (CenterX, size[1]//2) 
+        ScoreRect.x = Player1Rect.x + Player1Rect.width
+        ScoreRect.y = 300
+        BOX_X = ScoreRect.x - 5
+        BOX_Y = ScoreRect.y - 5
         screen.blit(Score, ScoreRect)
         BackWidth = ScoreRect.width + 10
         BackHeight = ScoreRect.height + 10
         
         
-        if ScoreRect.collidepoint(mouse):
+        if ScoreRect.collidepoint(mouse) or Active == True:
             BOXColour = WHITE
+            TextColour = BLACK
         else:
             BOXColour = BLACK
+            TextColour = WHITE
         pygame.display.flip()
 
         for event in pygame.event.get():
@@ -47,17 +59,17 @@ def InputName():
                     
                 elif event.type== pygame.MOUSEBUTTONDOWN and event.button == 1:
                     mouse = pygame.mouse.get_pos()
-                    if ScoreRect.collidepoint(mouse):
+                    if BOXRect.collidepoint(mouse):
                         Active = True
                         
-                elif Active == True:
+                if Active == True:
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_BACKSPACE:
-                            text = text[:-1]
+                            Text = Text[:-1]
                         elif event.key == pygame.K_RETURN:
                             Active = False
                         else:
-                            Text += event.unicode
+                            Text += (event.unicode).upper()
                     
                     #endif
                 #end if
