@@ -86,7 +86,7 @@ def Menu1():
                         return 'special'
                         choice == True
                     #end if
-                elif event.type== pygame.MOUSEBUTTONDOWN and event.button == 1:
+                elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     mouse = pygame.mouse.get_pos()
                     if SingleRect.collidepoint(mouse):
                         choice = True
