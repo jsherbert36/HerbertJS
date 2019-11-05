@@ -1,3 +1,4 @@
+### SRC - This is a great effort. I look forward to seeing the OOP version
 from FileIO import read_text,output_text
 
 def Rotor(RotorNum,Character,Direction):   #Rotors are accurate to German WWII specs

@@ -1,3 +1,5 @@
+### SRC - Excellent, I really like the implementation
+
 from FileIO import read_text,output_text
 def generateKey(string, key): 
     key = list(key) 
