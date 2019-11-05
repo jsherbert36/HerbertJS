@@ -1,3 +1,4 @@
+### SRC - Great, which was faster?
 # Basic function to calculate factorials recursively
 def Factorial1(Num):
     if Num == 0:
