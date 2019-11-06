@@ -1,3 +1,5 @@
+### SRC - Great code, I like the integer maths implementation
+
 import pygame
 # -- Global Constants
 
