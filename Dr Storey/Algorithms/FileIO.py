@@ -12,12 +12,14 @@ def read_text():
     return (f.read())
     f.close()
 #endprocedure
+    s
 def output_text(String):
     file = input("Please enter the output file name: ")    
     f = open(file,"wt")        
     f.write(String)
     f.close()
 #endprocedure
+    
 def input_list():
     finish = False
     while finish == False:
@@ -29,6 +31,7 @@ def input_list():
             print('File not found - try again')
     return (json.load(f))
     f.close()
+#endprocedure
 
 def output_list(List):
     file = input("Please enter the .json output file name: ")    
