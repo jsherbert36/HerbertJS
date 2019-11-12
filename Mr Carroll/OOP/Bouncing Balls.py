@@ -78,6 +78,8 @@ while not game_over:
         #End If
     #Next event
     screen.fill (BLACK)
+    if ball_size < 2:
+        ball_size = 2
     for circle in circles:
         circle.move()
         circle.size = ball_size
