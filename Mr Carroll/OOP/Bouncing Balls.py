@@ -11,25 +11,27 @@ GREEN = (51, 255, 51)
 PURPLE = (153, 51, 255)
 LIGHTBLUE = (51, 255, 255)
 ORANGE = (255, 51, 51)
-BALLCOLOURS = (WHITE,BLUE,YELLOW,RED,PINK,GREEN,PURPLE,LIGHTBLUE,ORANGE)
+BALLCOLOURS = (WHITE,BLUE,YELLOW,GREEN,PINK,RED,PURPLE,LIGHTBLUE)
 class Ball():
-    def __init__(self, x, y):
+    def __init__(self, x, y,screen_dimensions,colour):
         self.x = x
         self.y = y
         self.direction_y = random.randint(8,12) * random.choice([1,-1])
         self.direction_x = random.randint(8,12) * random.choice([1,-1])
-        self.colour = BALLCOLOURS[random.randint(0,8)]
+        self.colour = colour
         self.size = 15
-        
+        self.width = (screen_dimensions[0],screen_dimensions[1])
+        self.height = (screen_dimensions[2],screen_dimensions[3])
+
     def move(self):
-        if self.y > size[1] - self.size:
-            self.direction_y *= -1
-        elif self.y < self.size:
-            self.direction_y *= -1
-        elif self.x < self.size:
-            self.direction_x *= -1
-        elif self.x > size[0] - self.size:
-            self.direction_x *= -1
+        if self.y > self.height[1] - self.size:
+            self.direction_y = abs(self.direction_y) * -1 
+        elif self.y < self.height[0] + self.size:
+            self.direction_y = abs(self.direction_y)
+        elif self.x < self.width[0] + self.size:
+            self.direction_x = abs(self.direction_x)
+        elif self.x > self.width[1] - self.size:
+            self.direction_x = abs(self.direction_x) * -1
                 
         #End if
         self.y += self.direction_y 
@@ -49,11 +51,18 @@ pygame.display.set_caption("Bouncing Balls")
 
 game_over = False
 ball_size = 15
-circles = []
-for i in range(50):
-    X = random.randint(2,size[0])
-    Y = random.randint(2,size[1])
-    circles.append(Ball(X,Y))
+dimensions =[[],[],[],[]]
+dimensions[0] = [0,size[0]//2,0,size[1]//2]
+dimensions[1] = [0,size[0]//2,size[1]//2,size[1]]
+dimensions[2] = [size[0]//2,size[0],0,size[1]//2]
+dimensions[3] = [size[0]//2,size[0],size[1]//2,size[1]]
+quadrants = [[],[],[],[]]
+for i in range(4):
+    for j in range(11):
+        X = random.randint(dimensions[i][0],dimensions[i][1])
+        Y = random.randint(dimensions[i][2],dimensions[i][3])
+        e = random.choice([0,4])
+        quadrants[i].append(Ball(X,Y,dimensions[i],BALLCOLOURS[i + e]))
 #endfor 
 
 ### -- Game Loop
@@ -65,11 +74,13 @@ while not game_over:
             if event.key == pygame.K_ESCAPE:
                 game_over = True
             elif event.key == pygame.K_SPACE:
-                for i in range(20):
-                    X = random.randint(2,size[0])
-                    Y = random.randint(2,size[1])
-                    circles.append(Ball(X,Y))
-                #endfor 
+                for i in range(4):
+                    for j in range(11):
+                        X = random.randint(dimensions[i][0],dimensions[i][1])
+                        Y = random.randint(dimensions[i][2],dimensions[i][3])
+                        e = random.choice([0,4])
+                        quadrants[i].append(Ball(X,Y,dimensions[i],BALLCOLOURS[i + e]))
+                    #endfor 
             elif event.key == pygame.K_UP:
                 ball_size += 3
             elif event.key == pygame.K_DOWN:
@@ -80,10 +91,11 @@ while not game_over:
     screen.fill (BLACK)
     if ball_size < 2:
         ball_size = 2
-    for circle in circles:
-        circle.move()
-        circle.size = ball_size
-        circle.draw()
+    for quadrant in quadrants:
+        for circle in quadrant:
+            circle.move()
+            circle.size = ball_size
+            circle.draw()
 
     pygame.display.flip()
 

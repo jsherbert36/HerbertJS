@@ -35,103 +35,72 @@ class Block(pygame.sprite.Sprite):
         Called by update() or the main program loop if there is a collision.
         """
         self.rect.y = random.randrange(-300, -20)
-        self.rect.x = random.randrange(0, screen_width)
+        self.rect.x = random.randrange(0, size[0])
  
     def update(self):
-        """ Called each frame. """
- 
         # Move block down one pixel
         self.rect.y += 1
- 
         # If block is too far down, reset to top of screen.
         if self.rect.y > 410:
             self.reset_pos()
  
- 
 class Player(Block):
-    """ The player class derives from Block, but overrides the 'update'
-    functionality with new a movement function that will move the block
-    with the mouse. """
     def update(self):
-        # Get the current mouse position. This returns the position
-        # as a list of two numbers.
+        
         pos = pygame.mouse.get_pos()
- 
-        # Fetch the x and y out of the list,
-        # just like we'd fetch letters out of a string.
-        # Set the player object to the mouse location
         self.rect.x = pos[0]
         self.rect.y = pos[1]
  
 # Initialize Pygame
 pygame.init()
- 
-# Set the height and width of the screen
-screen_width = 700
-screen_height = 400
-screen = pygame.display.set_mode([screen_width, screen_height])
+size = (700,400)
+screen = pygame.display.set_mode(size)
  
 # This is a list of 'sprites.' Each block in the program is
 # added to this list. The list is managed by a class called 'Group.'
 block_list = pygame.sprite.Group()
- 
 # This is a list of every sprite. All blocks and the player block as well.
 all_sprites_list = pygame.sprite.Group()
  
 for i in range(50):
-    # This represents a block
     block = Block(WHITE, 20, 20)
- 
-    # Set a random location for the block
-    block.rect.x = random.randrange(screen_width)
-    block.rect.y = random.randrange(screen_height)
- 
+    block.rect.x = random.randrange(size[0])
+    block.rect.y = random.randrange(size[1])
     # Add the block to the list of objects
     block_list.add(block)
     all_sprites_list.add(block)
  
-# Create a red player block
 player = Player(RED, 30, 30)
 all_sprites_list.add(player)
- 
-# Loop until the user clicks the close button.
 done = False
- 
-# Used to manage how fast the screen updates
 clock = pygame.time.Clock()
- 
 score = 0
- 
+font = pygame.font.Font('freesansbold.ttf', 40)
+
 # -------- Main Program Loop -----------
 while not done:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             done = True
  
-    # Clear the screen
     screen.fill(BLACK)
- 
     # Calls update() method on every sprite in the list
     all_sprites_list.update()
- 
     # See if the player block has collided with anything.
     blocks_hit_list = pygame.sprite.spritecollide(player, block_list, False)
- 
-    # Check the list of collisions.
     for block in blocks_hit_list:
         score += 1
-        print(score)
- 
         # Reset block to the top of the screen to fall again.
         block.reset_pos()
- 
-    # Draw all the spites
-    all_sprites_list.draw(screen)
- 
-    # Limit to 20 frames per second
+
+    # Draw all the sprites
+    all_sprites_list.draw(screen) 
+    Score = font.render(str(score), True, WHITE)
+    ScoreRect = Score.get_rect()
+    ScoreRect.center = (size[0]//2, size[1] - 50) 
+    screen.blit(Score, ScoreRect)
+    
     clock.tick(20)
- 
-    # Go ahead and update the screen with what we've drawn.
     pygame.display.flip()
  
 pygame.quit()
