@@ -58,7 +58,7 @@ dimensions[2] = [size[0]//2,size[0],0,size[1]//2]
 dimensions[3] = [size[0]//2,size[0],size[1]//2,size[1]]
 quadrants = [[],[],[],[]]
 for i in range(4):
-    for j in range(11):
+    for j in range(20):
         X = random.randint(dimensions[i][0],dimensions[i][1])
         Y = random.randint(dimensions[i][2],dimensions[i][3])
         e = random.choice([0,4])
