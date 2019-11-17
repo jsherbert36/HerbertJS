@@ -122,6 +122,8 @@ def driver_code():
             new_list = mergesort(arr)
         elif Type.upper() in 'JACOBSORT':
             new_list = JacobSort(arr)
+        elif Type.upper() == 'X':
+            new_list = sorted(arr)
         else:
             print('Invalid Input')
             time.sleep(20)
