@@ -71,7 +71,7 @@ bullet_group = pygame.sprite.Group()
 all_sprites_group = pygame.sprite.Group()
 bullets_hit_group = pygame.sprite.Group()
 invaders_hit_group = pygame.sprite.Group()
- 
+player_hit_list = pygame.sprite.Group()
 for i in range(75):
     invader = Invader()
     invader.rect.x = random.randrange(0,(size[0]-30),30)
@@ -85,6 +85,7 @@ all_sprites_group.add(player)
 game_over = False
 clock = pygame.time.Clock()
 score = 0
+lives = 5
 font = pygame.font.Font('freesansbold.ttf', 20)
 bullet_num = 75
 # -------- Main Program Loop ----------- #
@@ -120,14 +121,22 @@ while not game_over:
         bullet_list.append(val)
     for bullet in bullet_list:
         score += 5
+    player_hit_list = pygame.sprite.spritecollide(player, invader_group, True)
+    for invader in player_hit_list:
+        lives -= 1
+    if lives == 0:
+        game_over = True
 
+    Lives = font.render('Lives: '+ str(lives), True, WHITE) 
+    LivesRect = Lives.get_rect()
+    LivesRect.topleft = (20,100)
     Score = font.render('Score: '+ str(score), True, WHITE)
     ScoreRect = Score.get_rect()
     ScoreRect.topleft = (20,20)
     Bullets = font.render('Bullets: ' + str(bullet_num), True, WHITE)
     BulletsRect = Bullets.get_rect()
     BulletsRect.topleft = (20,60)
-    
+    screen.blit(Lives, LivesRect)
     screen.blit(Score, ScoreRect)
     screen.blit(Bullets,BulletsRect) 
     all_sprites_group.draw(screen) 
