@@ -7,10 +7,12 @@ GREEN = (0, 255, 0)
 RED = (255, 0, 0)
  
 class Invader(pygame.sprite.Sprite):
-    def __init__(self):
+    direction = 1
+    def __init__(self,dimension):
+        self.dimension = dimension
         # Call the parent class (Sprite) constructor
         super().__init__()
-        self.image = pygame.Surface([20, 20])
+        self.image = pygame.Surface([self.dimension, self.dimension])
         self.image.fill(WHITE)
         self.rect = self.image.get_rect()
  
@@ -18,17 +20,23 @@ class Invader(pygame.sprite.Sprite):
         """ Reset position to the top of the screen, at a random x location.
         Called by update() or the main program loop if there is a collision.
         """
-        self.rect.x = random.randrange(0,(size[0]-30),30)
-        self.rect.y = random.randrange(-300,-20,30)
+        self.rect.x = random.randrange(90,(size[0]-120),invader.dimension+10)
+        self.rect.y = random.randrange(-300,-20,invader.dimension+10)
  
     def update(self):
-        self.rect.y += 1
-        if self.rect.y > size[1] + 10:
-            self.reset_pos()
+        self.rect.x += self.direction 
+        for invader in invader_group:
+            if invader.rect.x > size[0] - self.dimension*2:
+                self.direction = -1
+                self.rect.y += 3
+            elif invader.rect.x < self.dimension:
+                self.direction = 1
+                self.rect.y += 3
+        
  
 class Player(Invader):
     def __init__(self):
-        super().__init__()
+        super().__init__(20)
         self.image = pygame.Surface([20, 20])
         self.image.fill(RED)
         self.speed = 7
@@ -53,7 +61,7 @@ class Bullet(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.centerx = X
         self.rect.y = Y
-        self.speed = 3
+        self.speed = 5
 
     def update(self):
         self.rect.y -= self.speed
@@ -62,23 +70,22 @@ class Bullet(pygame.sprite.Sprite):
 
 # Initialize Pygame
 pygame.init()
-size = (900,650)
+size = (1280,720)
 screen = pygame.display.set_mode(size)
-# This is a group of 'sprites.' Each invader in the program is
-# added to this group. The group is managed by a class called 'Group.'
 invader_group = pygame.sprite.Group()
 bullet_group = pygame.sprite.Group()
 all_sprites_group = pygame.sprite.Group()
 bullets_hit_group = pygame.sprite.Group()
 invaders_hit_group = pygame.sprite.Group()
 player_hit_list = pygame.sprite.Group()
-for i in range(75):
-    invader = Invader()
-    invader.rect.x = random.randrange(0,(size[0]-30),30)
-    invader.rect.y = random.randrange(-200,50,30)
-    # Add the invader to the group of objects
-    invader_group.add(invader)
-    all_sprites_group.add(invader)
+for i in range(20,300,40):
+    for j in range(90,size[0]-120,size[0]//30):
+        invader = Invader(30)
+        invader.rect.x = j
+        invader.rect.y = i
+        # Add the invader to the group of objects
+        invader_group.add(invader)
+        all_sprites_group.add(invader)
 
 player = Player()
 all_sprites_group.add(player)
@@ -140,7 +147,7 @@ while not game_over:
     screen.blit(Score, ScoreRect)
     screen.blit(Bullets,BulletsRect) 
     all_sprites_group.draw(screen) 
-    clock.tick(50)
+    clock.tick(40)
     pygame.display.flip()
  
 pygame.quit()
