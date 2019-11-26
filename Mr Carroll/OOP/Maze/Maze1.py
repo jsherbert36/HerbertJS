@@ -5,25 +5,34 @@ BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
- 
+def generate_wall(List,Dimension):
+    for i in range(len(List)):
+        for j in range(len(List[i])):
+            if List[i][j] == True:
+                wall1 = Wall(((j*Dimension),(i*Dimension)),Dimension)
+                wall_group.add(wall1)
+                all_sprites_group.add(wall1)
+            #end if
+        #next j
+    #next i 
+    
 class Wall(pygame.sprite.Sprite):
-    def __init__(self,dimension):
-        self.x = dimension[0]
-        self.y = dimension[1]
+    def __init__(self,dimension,block_width):
         super().__init__()
-        self.image = pygame.Surface([self.x, self.y])
+        self.image = pygame.Surface([block_width, block_width])
         self.image.fill(WHITE)
         self.rect = self.image.get_rect()
-
+        self.rect.y = dimension[1]
+        self.rect.x = dimension[0]
 # Initialize Pygame
+Wall_List = FileIO.input_list()
 pygame.init()
 size = (1000,700)
-screen = pygame.display.set_mode(size,pygame.FULLSCREEN)
-
-
-
-player = Player()
-all_sprites_group.add(player)
+block_width = 15
+screen = pygame.display.set_mode(size)
+wall_group = pygame.sprite.Group()
+all_sprites_group = pygame.sprite.Group()
+generate_wall(Wall_List,block_width)
 game_over = False
 clock = pygame.time.Clock()
 # -------- Main Program Loop ----------- #
@@ -43,22 +52,7 @@ while not game_over:
     elif keys[pygame.K_LEFT]:
         player.move('left')
     screen.fill(BLACK)    
-    all_sprites_group.update()
-    
-    if not invader_group:
-        game_over = True
-    
-    bullets_hit_dict = pygame.sprite.groupcollide(bullet_group, invader_group, True,True)
-    bullet_list = []
-    for key,val in bullets_hit_dict.items():
-        bullet_list.append(val)
-    for bullet in bullet_list:
-        score += 5
-    player_hit_list = pygame.sprite.spritecollide(player, invader_group, True)
-    for invader in player_hit_list:
-        lives -= 1
-    if lives == 0:
-        game_over = True
+    #all_sprites_group.update()
  
     all_sprites_group.draw(screen) 
     clock.tick(50)
