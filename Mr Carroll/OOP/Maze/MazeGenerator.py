@@ -1,16 +1,18 @@
 import numpy,FileIO
 from numpy.random import randint as rand
-def generate_maze(width=81, height=51, density=.75, complexity=.75):
+def generate(width=81, height=51, complexity=.75, density=.75):
     # Only odd dimensions
     dimension = ((height // 2) * 2 + 1, (width // 2) * 2 + 1)
-    # Adjust complexity and density relative to maze size
-    complexity = int(complexity * (5 * (dimension[0] + dimension[1])))  # Number of components
-    density = int(density * ((dimension[0] // 2) * (dimension[1] // 2)))  # Size of components
+    complexity = int(complexity * (5 * (dimension[0] + dimension[1])))  # No. of blocks
+    density = int(density * ((dimension[0] // 2) * (dimension[1] // 2)))  # Size of blocks
     Z = numpy.zeros(dimension, dtype=bool)
-    # Make paths/walls
+    Z[0, :] = 1
+    Z[-1, :] = 1
+    Z[:, 0] = 1
+    Z[:, -1] = 1
     for i in range(density):
-        x = rand(0, dimension[1] // 2) * 2
-        y = rand(0, dimension[0] // 2) * 2 
+        y = 2 * rand(0, dimension[0] // 2)
+        x = 2 * rand(0, dimension[1] // 2) 
         Z[y, x] = 1
         for j in range(complexity):
             neighbours = []
@@ -36,7 +38,4 @@ def generate_maze(width=81, height=51, density=.75, complexity=.75):
             #endif
         #next j
     return Z
-width = 1000//15
-height = 700//15
-Maze_List = (generate_maze(width,height,10)).tolist()
-FileIO.output_list(Maze_List)
+
