@@ -7,7 +7,7 @@ RED = (255, 0, 0)
 def generate_wall(List,Dimension):
     for i in range(len(List)):
         for j in range(len(List[i])):
-            if List[i][j] == True:
+            if List[i][j] == 1:
                 wall1 = Wall(((j*Dimension),(i*Dimension)),Dimension)
                 wall_group.add(wall1)
                 all_sprites_group.add(wall1)
@@ -57,8 +57,8 @@ class Player(pygame.sprite.Sprite):
             elif val == 'up': self.rect.top = block.rect.bottom
                 
 # Initialize Pygame
-block_width = 13
 User_Choice = input('Generate new maze? (Y/N): ')
+block_width = int(input('Enter Block Size (integer):'))
 pygame.init()
 x = 1000 + (1000 % block_width)
 y = 700 + (700 % block_width)
