@@ -56,20 +56,6 @@ def getNodes(Maze):
                 elif neighbours[0] ^ neighbours[1] and neighbours[2] ^ neighbours[3]:
                     Node_List.append((x,y))
     return Node_List
-
-
-def move(direction,plane):
-    while Maze[y][x] != 1:
-        if plane == 'vertical':
-            y += direction
-        else:
-            x += direction
-        CurrentNode = [x,y]
-        if CurrentNode in Nodes:
-            Node_Dict[Node].append(CurrentNode)
-    y = Node[1]
-    x = Node[0]
-    CurrentNode = Node
     
 def getConnections(Maze,Nodes):
     Node_Dict = [[] for i in range(len(Nodes))]   #Node_Dict is a dictionary of list of lists of coordinates, keys are also lists of coordinates
@@ -120,7 +106,8 @@ def getConnections(Maze,Nodes):
             x = Nodes[i][0]
             y = Nodes[i][1]
     return Node_Dict
-maze = FileIO.input_list('Block15.json')
-FileIO.output_list(getNodes(maze))
-nodes = FileIO.input_list('nodes.json')
+#maze = FileIO.input_list('Block15.json')
+#FileIO.output_list(getNodes(maze))
+nodes = FileIO.input_list('nodes_list.json')
+maze = FileIO.input_list('wall_list.json')
 FileIO.output_list(getConnections(maze,nodes))
