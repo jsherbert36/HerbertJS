@@ -72,45 +72,55 @@ def move(direction,plane):
     CurrentNode = Node
     
 def getConnections(Maze,Nodes):
-    Nodes = [tuple(i) for i in Nodes]
     Node_Dict = [[] for i in range(len(Nodes))]   #Node_Dict is a dictionary of list of lists of coordinates, keys are also lists of coordinates
     for i in range(len(Nodes)):
-        CurrentNode = Nodes[i]
         x = Nodes[i][0]
         y = Nodes[i][1]
         if Maze[y-1][x]== 0:
-            while Maze[y][x] != 1:
+            Found = False
+            count = 0
+            while Maze[y][x] != 1 and Found == False:
                 y -= 1
-                CurrentNode = [x,y]
-                if CurrentNode in Nodes:
-                    Node_Dict[i].append(CurrentNode)
+                count += 1
+                if [x,y] in Nodes:
+                    Node_Dict[i].append([x,y,count])
+                    Found = True
             y = Nodes[i][1]
-            CurrentNode = Nodes[i]
-        if Maze[y+1][x]== 0: 
-            while Maze[y][x] != 1:
+            x = Nodes[i][0]
+        if Maze[y+1][x]== 0:
+            Found = False
+            count = 0
+            while Maze[y][x] != 1 and Found == False:
                 y += 1
-                CurrentNode = [x,y]
-                if CurrentNode in Nodes:
-                    Node_Dict[i].append(CurrentNode)
+                count += 1
+                if [x,y] in Nodes:
+                    Node_Dict[i].append([x,y,count])
+                    Found = True
             y = Nodes[i][1]
-            CurrentNode = Nodes[i]
-        if Maze[y][x-1]== 0: 
-            while Maze[y][x] != 1:
+            x = Nodes[i][0]
+        if Maze[y][x-1]== 0:
+            Found = False
+            count = 0
+            while Maze[y][x] != 1 and Found == False:
                 x -= 1
-                CurrentNode = [x,y]
-                if CurrentNode in Nodes:
-                    Node_Dict[i].append(CurrentNode)
+                count += 1
+                if [x,y] in Nodes:
+                    Node_Dict[i].append([x,y,count])
+                    Found = True
             x = Nodes[i][0]
-            CurrentNode = Nodes[i]
+            y = Nodes[i][1]
         if Maze[y][x+1] == 0:
-            while Maze[y][x] != 1:
+            Found = False
+            while Maze[y][x] != 1 and Found == False:
                 x += 1
-                CurrentNode = [x,y]
-                if CurrentNode in Nodes:
-                    Node_Dict[i].append(CurrentNode)
+                count += 1
+                if [x,y] in Nodes:
+                    Node_Dict[i].append([x,y,count])
+                    Found = True
             x = Nodes[i][0]
-            CurrentNode = Nodes[i]
+            y = Nodes[i][1]
     return Node_Dict
-maze = FileIO.input_list('test_maze.json')
+maze = FileIO.input_list('Block15.json')
+FileIO.output_list(getNodes(maze))
 nodes = FileIO.input_list('nodes.json')
 FileIO.output_list(getConnections(maze,nodes))

@@ -70,6 +70,17 @@ if User_Choice.upper() == 'Y':
     FileIO.output_list(Wall_List)
 else:
     Wall_List = FileIO.input_list()
+#endif
+Node_List = MazeGenerator.getNodes(Wall_List)
+Connection_List = MazeGenerator.getConnections(Wall_List,Node_List)
+Connection_Dict = {tuple(i):[] for i in Node_List}
+for i in range(len(Connection_List)):
+    print(Connection_List[i])
+    for j in Connection_List[i]:
+        print(j[0],j[1],j[2])
+        Connection_Dict[tuple(Node_List[i])].append({(j[0],j[1]):j[2]})
+    #next j
+#next i 
 screen = pygame.display.set_mode(size)
 wall_group = pygame.sprite.Group()
 all_sprites_group = pygame.sprite.Group()
