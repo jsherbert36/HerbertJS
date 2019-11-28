@@ -1,4 +1,4 @@
-import numpy,FileIO
+import numpy,FileIO,math,heapq
 from numpy.random import randint as rand
 def generate(width=81, height=51, complexity=.75, density=.75):
     # Only odd dimensions
@@ -52,13 +52,13 @@ def getNodes(Maze):
                     if Maze[y][x-1]== 0: neighbours[0] = 1
                     if Maze[y][x+1] == 0: neighbours[1] = 1
                 if neighbours.count(1) > 2:
-                    Node_List.append((x,y))
+                    Node_List.append([x,y])
                 elif neighbours[0] ^ neighbours[1] and neighbours[2] ^ neighbours[3]:
-                    Node_List.append((x,y))
+                    Node_List.append([x,y])
     return Node_List
     
 def getConnections(Maze,Nodes):
-    Node_Dict = [[] for i in range(len(Nodes))]   #Node_Dict is a dictionary of list of lists of coordinates, keys are also lists of coordinates
+    Adjacency_Vector = [[] for i in range(len(Nodes))]   #Adjacency_Vector is a list of lists of coordinates and weights
     for i in range(len(Nodes)):
         x = Nodes[i][0]
         y = Nodes[i][1]
@@ -69,7 +69,7 @@ def getConnections(Maze,Nodes):
                 y -= 1
                 count += 1
                 if [x,y] in Nodes:
-                    Node_Dict[i].append([x,y,count])
+                    Adjacency_Vector[i].append([x,y,count])
                     Found = True
             y = Nodes[i][1]
             x = Nodes[i][0]
@@ -80,7 +80,7 @@ def getConnections(Maze,Nodes):
                 y += 1
                 count += 1
                 if [x,y] in Nodes:
-                    Node_Dict[i].append([x,y,count])
+                    Adjacency_Vector[i].append([x,y,count])
                     Found = True
             y = Nodes[i][1]
             x = Nodes[i][0]
@@ -91,7 +91,7 @@ def getConnections(Maze,Nodes):
                 x -= 1
                 count += 1
                 if [x,y] in Nodes:
-                    Node_Dict[i].append([x,y,count])
+                    Adjacency_Vector[i].append([x,y,count])
                     Found = True
             x = Nodes[i][0]
             y = Nodes[i][1]
@@ -101,13 +101,19 @@ def getConnections(Maze,Nodes):
                 x += 1
                 count += 1
                 if [x,y] in Nodes:
-                    Node_Dict[i].append([x,y,count])
+                    Adjacency_Vector[i].append([x,y,count])
                     Found = True
             x = Nodes[i][0]
             y = Nodes[i][1]
-    return Node_Dict
-#maze = FileIO.input_list('Block15.json')
-#FileIO.output_list(getNodes(maze))
-nodes = FileIO.input_list('nodes_list.json')
-maze = FileIO.input_list('wall_list.json')
-FileIO.output_list(getConnections(maze,nodes))
+    return Adjacency_Vector
+
+
+maze = FileIO.input_list('Block15.json')
+Node_List = getNodes(maze)
+Connection_List = getConnections(maze,Node_List)
+Connection_Dict = {tuple(i):[] for i in Node_List}
+for i in range(len(Connection_List)):
+    for j in Connection_List[i]:
+        temp = tuple(Node_List[i])
+        Connection_Dict[temp].append({(j[0],j[1]):j[2]})
+print(Dijkstra(Connection_Dict,3))

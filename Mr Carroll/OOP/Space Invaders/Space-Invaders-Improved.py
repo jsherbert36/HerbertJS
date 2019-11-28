@@ -30,12 +30,10 @@ class Space():
 
         def shoot(self):  
             if self.rect.x % random.randint(7,27) == 0 and self.rect.y % random.randint(5,25) == 0:
-                print('Shoot')
                 invader_bullet = Space.Invader_Bullet(self.rect.centerx,self.rect.y)
                 invader_bullet_group.add(invader_bullet)
                 all_sprites_group.add(invader_bullet)
-        
- 
+         
     class Player(Invader):
         def __init__(self):
             super().__init__(20)

@@ -72,13 +72,11 @@ else:
     Wall_List = FileIO.input_list()
 #endif
 Node_List = MazeGenerator.getNodes(Wall_List)
-FileIO.output_list(Wall_List)
-FileIO.output_list(Node_List)
 Connection_List = MazeGenerator.getConnections(Wall_List,Node_List)
 Connection_Dict = {tuple(i):[] for i in Node_List}
 for i in range(len(Connection_List)):
     for j in Connection_List[i]:
-        temp = tuple(Node_list[i])
+        temp = tuple(Node_List[i])
         Connection_Dict[temp].append({(j[0],j[1]):j[2]})
     #next j
 #next i
@@ -90,6 +88,7 @@ game_over = False
 clock = pygame.time.Clock()
 player1 = Player(block_width,pos)
 all_sprites_group.add(player1)
+
 # -------- Main Program Loop ----------- #
 while not game_over:
     for event in pygame.event.get():
