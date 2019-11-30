@@ -108,12 +108,12 @@ def getConnections(Maze,Nodes):
     return Adjacency_Vector
 
 
-maze = FileIO.input_list('Block15.json')
-Node_List = getNodes(maze)
-Connection_List = getConnections(maze,Node_List)
-Connection_Dict = {tuple(i):[] for i in Node_List}
-for i in range(len(Connection_List)):
-    for j in Connection_List[i]:
-        temp = tuple(Node_List[i])
-        Connection_Dict[temp].append({(j[0],j[1]):j[2]})
-print(Dijkstra(Connection_Dict,3))
+#maze = FileIO.input_list('Block15.json')
+#Node_List = getNodes(maze)
+#Connection_List = getConnections(maze,Node_List)
+#Connection_Dict = {tuple(i):[] for i in Node_List}
+#for i in range(len(Connection_List)):
+#    for j in Connection_List[i]:
+#        temp = tuple(Node_List[i])
+#        Connection_Dict[temp].append({(j[0],j[1]):j[2]})
+#print(Dijkstra(Connection_Dict,3))
