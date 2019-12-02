@@ -74,21 +74,14 @@ else:
 wall_group = pygame.sprite.Group()
 all_sprites_group = pygame.sprite.Group()
 pos = generate_wall(Wall_List,block_width)
-Start_Node = input('Enter the starting node e.g 49,38: ')
-End_Node = input('Enter the end node e.g 54,64: ')
+Start_X = int(input('Enter the starting node X value: '))
+Start_Y = int(input('Enter the starting node y value: '))
+End_X = int(input('Enter the end node X value: '))
+End_Y = int(input('Enter the end node Y value: '))
 Node_List = MazeGenerator.getNodes(Wall_List)
-if End_Node and Start_Node:
-    End_Node = [i for i in End_Node.split(',')]
-    Start_Node = [i for i in End_Node.split(',')]
-    Node_List.append(Start_Node,End_Node)
-Connection_List = MazeGenerator.getConnections(Wall_List,Node_List)
-Connection_Dict = {tuple(i):[] for i in Node_List}
-for i in range(len(Connection_List)):
-    for j in Connection_List[i]:
-        temp = tuple(Node_List[i])
-        Connection_Dict[temp].append({(j[0],j[1]):j[2]})
-    #next j
-#next i
+Node_List.extend([[Start_X,Start_Y],[End_X,End_Y]])
+print(Node_List)
+Connection_Dict = MazeGenerator.getConnections(Wall_List,Node_List)
 screen = pygame.display.set_mode(size)
 game_over = False
 clock = pygame.time.Clock()

@@ -69,7 +69,7 @@ def getConnections(Maze,Nodes):
                 y -= 1
                 count += 1
                 if [x,y] in Nodes:
-                    Adjacency_Vector[i].append([x,y,count])
+                    Adjacency_Vector[i].append([(Nodes.index([x,y])),count])
                     Found = True
             y = Nodes[i][1]
             x = Nodes[i][0]
@@ -80,7 +80,7 @@ def getConnections(Maze,Nodes):
                 y += 1
                 count += 1
                 if [x,y] in Nodes:
-                    Adjacency_Vector[i].append([x,y,count])
+                    Adjacency_Vector[i].append([(Nodes.index([x,y])),count])
                     Found = True
             y = Nodes[i][1]
             x = Nodes[i][0]
@@ -91,7 +91,7 @@ def getConnections(Maze,Nodes):
                 x -= 1
                 count += 1
                 if [x,y] in Nodes:
-                    Adjacency_Vector[i].append([x,y,count])
+                    Adjacency_Vector[i].append([(Nodes.index([x,y])),count])
                     Found = True
             x = Nodes[i][0]
             y = Nodes[i][1]
@@ -101,19 +101,20 @@ def getConnections(Maze,Nodes):
                 x += 1
                 count += 1
                 if [x,y] in Nodes:
-                    Adjacency_Vector[i].append([x,y,count])
+                    Adjacency_Vector[i].append([(Nodes.index([x,y])),count])
                     Found = True
             x = Nodes[i][0]
             y = Nodes[i][1]
-    return Adjacency_Vector
+    Connection_Dict = {i:[] for i in range(len(Nodes))}
+    for i in range(len(Adjacency_Vector)):
+        for j in Adjacency_Vector[i]:
+            temp = tuple(Nodes[i])
+            Connection_Dict[i].append({j[0]:j[1]})
+    return Connection_Dict    #list for each node containing lists of index of connecting node and distance
 
 
 #maze = FileIO.input_list('Block15.json')
 #Node_List = getNodes(maze)
 #Connection_List = getConnections(maze,Node_List)
-#Connection_Dict = {tuple(i):[] for i in Node_List}
-#for i in range(len(Connection_List)):
-#    for j in Connection_List[i]:
-#        temp = tuple(Node_List[i])
-#        Connection_Dict[temp].append({(j[0],j[1]):j[2]})
+#print(Connection_List)
 #print(Dijkstra(Connection_Dict,3))
