@@ -1,5 +1,6 @@
-import numpy,FileIO,math,heapq
+import numpy,FileIO,math,heapq,sys
 from numpy.random import randint as rand
+
 def generate(width=81, height=51, complexity=.75, density=.75):
     # Only odd dimensions
     dimension = ((height // 2) * 2 + 1, (width // 2) * 2 + 1)
@@ -18,25 +19,18 @@ def generate(width=81, height=51, complexity=.75, density=.75):
             neighbours = []
             if x > 1:
                 neighbours.append((y, x - 2))
-            #end if
             if x < dimension[1] - 2:
                 neighbours.append((y, x + 2))
-            #endif
             if y > 1:
                 neighbours.append((y - 2, x))
-            #endif
             if y < dimension[0] - 2:
                 neighbours.append((y + 2, x))
-            #endif
             if len(neighbours):
                 y_, x_ = neighbours[rand(0, len(neighbours) - 1)]
                 if Z[y_, x_] == 0:
                     Z[y_, x_] = 1
                     Z[y_ + (y - y_) // 2, x_ + (x - x_) // 2] = 1
                     x, y = x_, y_
-                #endif
-            #endif
-        #next j
     return Z
 
 def getNodes(Maze):
@@ -97,6 +91,7 @@ def getConnections(Maze,Nodes):
             y = Nodes[i][1]
         if Maze[y][x+1] == 0:
             Found = False
+            count = 0
             while Maze[y][x] != 1 and Found == False:
                 x += 1
                 count += 1
@@ -105,16 +100,37 @@ def getConnections(Maze,Nodes):
                     Found = True
             x = Nodes[i][0]
             y = Nodes[i][1]
-    Connection_Dict = {i:[] for i in range(len(Nodes))}
+    Connection_Dict = {i:{} for i in range(len(Nodes))}
     for i in range(len(Adjacency_Vector)):
         for j in Adjacency_Vector[i]:
-            temp = tuple(Nodes[i])
-            Connection_Dict[i].append({j[0]:j[1]})
+            Connection_Dict[i][j[0]] = j[1]
     return Connection_Dict    #list for each node containing lists of index of connecting node and distance
 
-
-#maze = FileIO.input_list('Block15.json')
-#Node_List = getNodes(maze)
-#Connection_List = getConnections(maze,Node_List)
-#print(Connection_List)
-#print(Dijkstra(Connection_Dict,3))
+def Dijkstra(graph,start_node,end_node):
+    shortest_distance = {}
+    Path = []
+    previous = {}
+    unseen_nodes = graph
+    for node in unseen_nodes:
+        shortest_distance[node] = math.inf
+    shortest_distance[start_node] = 0
+    while unseen_nodes:
+        min_node = None
+        for node in unseen_nodes:
+            if min_node is None:
+                min_node = node
+            elif shortest_distance[node] < shortest_distance[min_node]:
+                min_node = node
+        for Edge, Weight in graph[min_node].items():
+            if Weight + shortest_distance[min_node] < shortest_distance[Edge]:
+                shortest_distance[Edge] = Weight + shortest_distance[min_node]
+                previous[Edge] = min_node
+        unseen_nodes.pop(min_node)
+    current_node = end_node
+    while current_node != start_node:
+        Path.insert(0,current_node)
+        current_node = previous[current_node]  
+    Path.insert(0,start_node)
+    if shortest_distance[end_node] != math.inf:
+        return Path
+        

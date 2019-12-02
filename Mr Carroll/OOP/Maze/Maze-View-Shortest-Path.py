@@ -1,8 +1,9 @@
-import pygame,random,sys,FileIO,MazeGenerator
+import pygame,random,sys,FileIO,MazeGenerator,random
 # Define some colors
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 GREEN = (0, 255, 0)
+BLUE = (0,0,255)
 RED = (255, 0, 0)
 def generate_wall(List,Dimension):
     for i in range(len(List)):
@@ -11,19 +12,34 @@ def generate_wall(List,Dimension):
                 wall1 = Wall(((j*Dimension),(i*Dimension)),Dimension)
                 wall_group.add(wall1)
                 all_sprites_group.add(wall1)
-            else:
-                false_block = ((j*Dimension),(i*Dimension))
-            #end if
         #next j
     #next i
-    return false_block
+#end function
+
+def generate_path(Path_List,Dimension,Node_List):
+    for block in path_group:
+        block.kill()
+    for i in range(len(Path_List)-1):
+        Next = Node_List[Path_List[i+1]]
+        x = Node_List[Path_List[i]][0]
+        y = Node_List[Path_List[i]][1]
+        while [x,y] != Next:
+            if x < Next[0]: x += 1
+            elif x>Next[0]: x -= 1
+            if y < Next[1]: y +=1
+            elif y>Next[1]: y -= 1
+            path1 = Wall(((x*Dimension),(y*Dimension)),Dimension,BLUE)
+            path_group.add(path1)
+        #next j
+    #next i
 #end function
     
 class Wall(pygame.sprite.Sprite):
-    def __init__(self,dimension,block_width):
+    def __init__(self,dimension,block_width,colour = WHITE):
         super().__init__()
+        self.colour = colour
         self.image = pygame.Surface([block_width, block_width])
-        self.image.fill(WHITE)
+        self.image.fill(self.colour)
         self.rect = self.image.get_rect()
         self.rect.y = dimension[1]
         self.rect.x = dimension[0]
@@ -71,24 +87,23 @@ if User_Choice.upper() == 'Y':
 else:
     Wall_List = FileIO.input_list()
 #endif
-Node_List = MazeGenerator.getNodes(Wall_List)
-Connection_List = MazeGenerator.getConnections(Wall_List,Node_List)
-Connection_Dict = {tuple(i):[] for i in Node_List}
-for i in range(len(Connection_List)):
-    for j in Connection_List[i]:
-        temp = tuple(Node_List[i])
-        Connection_Dict[temp].append({(j[0],j[1]):j[2]})
-    #next j
-#next i
-screen = pygame.display.set_mode(size)
 wall_group = pygame.sprite.Group()
+path_group = pygame.sprite.Group()
 all_sprites_group = pygame.sprite.Group()
-pos = generate_wall(Wall_List,block_width)
+Node_List = MazeGenerator.getNodes(Wall_List)
+End = random.choice(Node_List)
+Start_Index = 0
+End_Index = Node_List.index(End)
+Connection_Dict = MazeGenerator.getConnections(Wall_List,Node_List)
+Path_List = MazeGenerator.Dijkstra(Connection_Dict,Start_Index,End_Index)
+generate_wall(Wall_List,block_width)
+generate_path(Path_List,block_width,Node_List)
+screen = pygame.display.set_mode(size)
 game_over = False
 clock = pygame.time.Clock()
+pos = (Node_List[0][0]*block_width,Node_List[0][1]*block_width)
 player1 = Player(block_width,pos)
 all_sprites_group.add(player1)
-
 # -------- Main Program Loop ----------- #
 while not game_over:
     for event in pygame.event.get():
@@ -97,6 +112,20 @@ while not game_over:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 game_over = True
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            mouse = pygame.mouse.get_pos()
+            x = mouse[0]//block_width
+            y = mouse[1]//block_width
+            if Wall_List[y][x] == 0:
+                if [x,y] not in Node_List:
+                    Node_List.append([x,y])
+                if event.button == 1:
+                    End_Index = Node_List.index([x,y])
+                elif event.button == 3:
+                    Start_Index = Node_List.index([x,y])
+                Connection_Dict = MazeGenerator.getConnections(Wall_List,Node_List)
+                Path_List = MazeGenerator.Dijkstra(Connection_Dict,Start_Index,End_Index)
+                generate_path(Path_List,block_width,Node_List)
             #endif
         #endif
     #next event
@@ -109,8 +138,9 @@ while not game_over:
         player1.move('down')
     elif keys[pygame.K_UP]:
         player1.move('up')
-    screen.fill(BLACK)    
-    all_sprites_group.draw(screen) 
+    screen.fill(BLACK)
+    path_group.draw(screen)
+    all_sprites_group.draw(screen)
     clock.tick(50)
     pygame.display.flip()
  
