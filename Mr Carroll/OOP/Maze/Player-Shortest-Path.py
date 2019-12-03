@@ -1,6 +1,4 @@
 import pygame,random,sys,FileIO,MazeGenerator,random
-from collections import deque
-# Define some colors
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 GREEN = (0, 255, 0)
@@ -34,33 +32,6 @@ def generate_path(Path_List,Dimension,Node_List):
         #next j
     #next i
 #end function
-
-def follow_path(Path_List,Dimension,Node_List):
-    player1.move_queue = []
-    for i in range(len(Path_List)-1):
-        Next_X = Node_List[Path_List[i+1]][0]
-        Next_Y = Node_List[Path_List[i+1]][1]
-        x = Node_List[Path_List[i]][0]
-        y = Node_List[Path_List[i]][1]
-        if x < Next_X:
-            player1.move('right')
-            print('right')
-            print(player1.move_queue)
-        if x > Next_X:
-            player1.move('left')
-            print('left')
-            print(player1.move_queue)
-        if y > Next_Y:
-            player1.move('up')
-            print('up')
-            print(player1.move_queue)
-        if y < Next_Y:
-            player1.move('down')
-            print('down')
-            print(player1.move_queue)
-        #next j
-    #next i
-#end function
             
 class Wall(pygame.sprite.Sprite):
     def __init__(self,dimension,block_width,colour = WHITE):
@@ -76,60 +47,57 @@ class Wall(pygame.sprite.Sprite):
 class Player(pygame.sprite.Sprite):
     def __init__(self,block_width,dimension):
         super().__init__()
-        self.width = block_width - 3
+        self.width = block_width - 1
         self.image = pygame.Surface([self.width, self.width])
         self.image.fill(RED)
         self.rect = self.image.get_rect()
         self.rect.y = dimension[1]
         self.rect.x = dimension[0]
-        self.speed = 2
+        self.speed = 1
         self.direction = 'stop'
-        self.move_queue = []
         self.count = 0
+        self.node_queue = []
+        self.next_node = None
+
     def update(self):
-        x = self.rect.centerx//block_width
-        y = self.rect.centery//block_width
-        if [x,y] in Node_List and self.move_queue:
-            
-            if self.move_queue[0] == 'right' and Wall_List[y][x+1] == 0:
-                    self.direction = 'stop'
-                    self.rect.y = y*block_width + 1
-                    self.rect.right = (x+1) * block_width
-            elif self.move_queue[0] == 'left' and Wall_List[y][x-1] == 0:
-                    self.direction = 'stop'
-                    self.rect.y = y*block_width + 1
-                    self.rect.x = x * block_width
-            elif self.move_queue[0] == 'up' and Wall_List[y-1][x] == 0:
-                    self.direction = 'stop'
-                    self.rect.x = x*block_width + 1
-                    self.rect.y = y * block_width 
-            elif self.move_queue[0] == 'down' and Wall_List[y+1][x] == 0:
-                    self.direction = 'stop'
-                    self.rect.x = x*  block_width + 1
-                    self.rect.y = (y+1) * block_width
-            
-        #if self.direction == 'right' and Wall_List[y][x+1] == 1: self.direction = 'stop'
-        #elif self.direction == 'left' and Wall_List[y][x-1] == 1: self.direction = 'stop'
-        #elif self.direction == 'up' and Wall_List[y-1][x] == 1: self.direction = 'stop'
-        #elif self.direction == 'down' and Wall_List[y+1][x] == 1: self.direction = 'stop'
-        if self.direction == 'stop' and self.move_queue:
-            self.direction = self.move_queue.pop(0)
         if self.direction == 'right': self.rect.x += self.speed
         elif self.direction == 'left': self.rect.x -= self.speed
         elif self.direction == 'up': self.rect.y -= self.speed
         elif self.direction == 'down': self.rect.y += self.speed
-        wall_hit_group = pygame.sprite.spritecollide(self, wall_group, False)
-        for block in wall_hit_group:
-            if self.direction == 'right': self.rect.right = block.rect.left
-            elif self.direction == 'left': self.rect.left = block.rect.right
-            elif self.direction == 'down': self.rect.bottom = block.rect.top
-            elif self.direction == 'up': self.rect.top = block.rect.bottom
-            self.direction = 'stop'
-            pass
-        
-    def move(self,direction):
-        if direction == 'right' or direction == 'left' or direction == 'down' or direction == 'up':
-            self.move_queue.append(direction)
+        if self.direction == 'stop' and self.node_queue:
+            self.next_node = self.node_queue.pop(0)
+        if self.next_node != None:
+            Next_X = Node_List[self.next_node][0]
+            Next_Y = Node_List[self.next_node][1]
+            if self.direction == 'right':
+                Current_X = self.rect.left//block_width
+                Current_Y = self.rect.y//block_width
+            elif self.direction == 'left':
+                Current_X = self.rect.right//block_width
+                Current_Y = self.rect.y//block_width
+            elif self.direction == 'down':
+                Current_X = self.rect.x//block_width
+                Current_Y = self.rect.top//block_width
+            elif self.direction == 'up': 
+                Current_X = self.rect.x//block_width
+                Current_Y = self.rect.bottom//block_width
+            else:
+                Current_X = self.rect.x//block_width
+                Current_Y = self.rect.y//block_width
+            if Current_X < Next_X:
+                self.direction = 'right'
+            elif Current_X > Next_X:
+                self.direction = 'left'
+            elif Current_Y > Next_Y:
+                self.direction = 'up'
+            elif Current_Y < Next_Y:
+                self.direction = 'down'
+            if Next_X == Current_X and Next_Y == Current_Y:
+                self.direction = 'stop'
+    def move(self,Path_List):
+        self.direction = 'stop'
+        self.node_queue = Path_List[1:]
+
 
 # Initialize Pygame
 User_Choice = input('Generate new maze? (Y/N): ')
@@ -153,38 +121,25 @@ Node_List = MazeGenerator.getNodes(Wall_List)
 End = random.choice(Node_List)
 pos = (Node_List[0][0]*block_width,Node_List[0][1]*block_width)
 player1 = Player(block_width,pos)
-Start = [player1.rect.x//block_width,player1.rect.y//block_width]
-if Start not in Node_List:
-    Node_list.append(Start)
-Start_Index = Node_List.index(Start)
+Start_Index = 0
 End_Index = Node_List.index(End)
 Connection_Dict = MazeGenerator.getConnections(Wall_List,Node_List)
 Path_List = MazeGenerator.Dijkstra(Connection_Dict,Start_Index,End_Index)
 generate_wall(Wall_List,block_width)
 generate_path(Path_List,block_width,Node_List)
+player1.move(Path_List)
 screen = pygame.display.set_mode(size)
 game_over = False
 clock = pygame.time.Clock()
-
-
 all_sprites_group.add(player1)
-follow_path(Path_List,block_width,Node_List)
 # -------- Main Program Loop ----------- #
 while not game_over:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             game_over = True
-        #elif event.type == pygame.KEYDOWN:
-         #   if event.key == pygame.K_ESCAPE:
-          #      game_over = True
-           # if event.key == pygame.K_RIGHT:
-            #    player1.move('right')
-            #if event.key == pygame.K_LEFT:
-            #    player1.move('left')
-            #if event.key == pygame.K_DOWN:
-            #    player1.move('down')
-            #if event.key == pygame.K_UP:
-            #    player1.move('up')
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                game_over = True
         elif event.type == pygame.MOUSEBUTTONDOWN:
             mouse = pygame.mouse.get_pos()
             x = mouse[0]//block_width
@@ -194,14 +149,14 @@ while not game_over:
                     Node_List.append([x,y])
                 if event.button == 1:
                     End_Index = Node_List.index([x,y])
-                Start_Index = [player1.rect.x//block_width,player1.rect.y//block_width]
+                Start = [player1.rect.x//block_width,player1.rect.y//block_width]
                 if Start not in Node_List:
-                    Node_list.append(Start)
+                    Node_List.append(Start)
                 Start_Index = Node_List.index(Start)
                 Connection_Dict = MazeGenerator.getConnections(Wall_List,Node_List)
                 Path_List = MazeGenerator.Dijkstra(Connection_Dict,Start_Index,End_Index)
                 generate_path(Path_List,block_width,Node_List)
-                follow_path(Path_List,block_width,Node_List)
+                player1.move(Path_List)
             #endif
         #endif
     #next event
