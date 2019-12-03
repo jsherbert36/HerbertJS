@@ -55,12 +55,38 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.y = dimension[1]
         self.rect.x = dimension[0]
-        self.speed = 3
+        self.speed = 2
         self.direction = 'stop'
-        self.move_queue = deque([])
+        self.move_queue = []
+        self.count = 0
     def update(self):
-        if self.direction == 'stop' and not self.move_queue:
-            self.direction = move_queue.popleft()
+        x = self.rect.centerx//block_width
+        y = self.rect.centery//block_width
+        if [x,y] in Node_List and self.move_queue:
+            
+            if self.move_queue[0] == 'right' and Wall_List[y][x+1] == 0:
+                    self.direction = 'stop'
+                    self.rect.y = y*block_width + 1
+                    self.rect.right = (x+1) * block_width
+            elif self.move_queue[0] == 'left' and Wall_List[y][x-1] == 0:
+                    self.direction = 'stop'
+                    self.rect.y = y*block_width + 1
+                    self.rect.x = x * block_width
+            elif self.move_queue[0] == 'up' and Wall_List[y-1][x] == 0:
+                    self.direction = 'stop'
+                    self.rect.x = x*block_width + 1
+                    self.rect.y = y * block_width 
+            elif self.move_queue[0] == 'down' and Wall_List[y+1][x] == 0:
+                    self.direction = 'stop'
+                    self.rect.x = x*  block_width + 1
+                    self.rect.y = (y+1) * block_width
+            
+        #if self.direction == 'right' and Wall_List[y][x+1] == 1: self.direction = 'stop'
+        #elif self.direction == 'left' and Wall_List[y][x-1] == 1: self.direction = 'stop'
+        #elif self.direction == 'up' and Wall_List[y-1][x] == 1: self.direction = 'stop'
+        #elif self.direction == 'down' and Wall_List[y+1][x] == 1: self.direction = 'stop'
+        if self.direction == 'stop' and self.move_queue:
+            self.direction = self.move_queue.pop(0)
         if self.direction == 'right': self.rect.x += self.speed
         elif self.direction == 'left': self.rect.x -= self.speed
         elif self.direction == 'up': self.rect.y -= self.speed
@@ -72,10 +98,11 @@ class Player(pygame.sprite.Sprite):
             elif self.direction == 'down': self.rect.bottom = block.rect.top
             elif self.direction == 'up': self.rect.top = block.rect.bottom
             self.direction = 'stop'
-        x = self.rect.x//block_width
-        y = self.rect.y//block_width
-        if [x,y] in Node_List:
-            if Wall_List                                                                        #needs completing
+            pass
+        
+    def move(self,direction):
+        if direction == 'right' or direction == 'left' or direction == 'down' or direction == 'up':
+            self.move_queue.append(direction)
 
 # Initialize Pygame
 User_Choice = input('Generate new maze? (Y/N): ')
@@ -117,6 +144,14 @@ while not game_over:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 game_over = True
+            if event.key == pygame.K_RIGHT:
+                player1.move('right')
+            if event.key == pygame.K_LEFT:
+                player1.move('left')
+            if event.key == pygame.K_DOWN:
+                player1.move('down')
+            if event.key == pygame.K_UP:
+                player1.move('up')
         elif event.type == pygame.MOUSEBUTTONDOWN:
             mouse = pygame.mouse.get_pos()
             x = mouse[0]//block_width
@@ -134,20 +169,12 @@ while not game_over:
             #endif
         #endif
     #next event
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_RIGHT]:
-        player.move_queue.append('right')
-    elif keys[pygame.K_LEFT]:
-        player.move_queue.append('left')
-    elif keys[pygame.K_DOWN]:
-        player.move_queue.append('down')
-    elif keys[pygame.K_UP]:
-        player.move_queue.append('up')
     
     screen.fill(BLACK)
+    player1.update()
     path_group.draw(screen)
     all_sprites_group.draw(screen)
-    clock.tick(50)
+    clock.tick(60)
     pygame.display.flip()
  
 pygame.quit()
