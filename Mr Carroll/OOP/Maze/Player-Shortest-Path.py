@@ -34,7 +34,34 @@ def generate_path(Path_List,Dimension,Node_List):
         #next j
     #next i
 #end function
-    
+
+def follow_path(Path_List,Dimension,Node_List):
+    player1.move_queue = []
+    for i in range(len(Path_List)-1):
+        Next_X = Node_List[Path_List[i+1]][0]
+        Next_Y = Node_List[Path_List[i+1]][1]
+        x = Node_List[Path_List[i]][0]
+        y = Node_List[Path_List[i]][1]
+        if x < Next_X:
+            player1.move('right')
+            print('right')
+            print(player1.move_queue)
+        if x > Next_X:
+            player1.move('left')
+            print('left')
+            print(player1.move_queue)
+        if y > Next_Y:
+            player1.move('up')
+            print('up')
+            print(player1.move_queue)
+        if y < Next_Y:
+            player1.move('down')
+            print('down')
+            print(player1.move_queue)
+        #next j
+    #next i
+#end function
+            
 class Wall(pygame.sprite.Sprite):
     def __init__(self,dimension,block_width,colour = WHITE):
         super().__init__()
@@ -124,7 +151,12 @@ path_group = pygame.sprite.Group()
 all_sprites_group = pygame.sprite.Group()
 Node_List = MazeGenerator.getNodes(Wall_List)
 End = random.choice(Node_List)
-Start_Index = 0
+pos = (Node_List[0][0]*block_width,Node_List[0][1]*block_width)
+player1 = Player(block_width,pos)
+Start = [player1.rect.x//block_width,player1.rect.y//block_width]
+if Start not in Node_List:
+    Node_list.append(Start)
+Start_Index = Node_List.index(Start)
 End_Index = Node_List.index(End)
 Connection_Dict = MazeGenerator.getConnections(Wall_List,Node_List)
 Path_List = MazeGenerator.Dijkstra(Connection_Dict,Start_Index,End_Index)
@@ -133,25 +165,26 @@ generate_path(Path_List,block_width,Node_List)
 screen = pygame.display.set_mode(size)
 game_over = False
 clock = pygame.time.Clock()
-pos = (Node_List[0][0]*block_width,Node_List[0][1]*block_width)
-player1 = Player(block_width,pos)
+
+
 all_sprites_group.add(player1)
+follow_path(Path_List,block_width,Node_List)
 # -------- Main Program Loop ----------- #
 while not game_over:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             game_over = True
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
-                game_over = True
-            if event.key == pygame.K_RIGHT:
-                player1.move('right')
-            if event.key == pygame.K_LEFT:
-                player1.move('left')
-            if event.key == pygame.K_DOWN:
-                player1.move('down')
-            if event.key == pygame.K_UP:
-                player1.move('up')
+        #elif event.type == pygame.KEYDOWN:
+         #   if event.key == pygame.K_ESCAPE:
+          #      game_over = True
+           # if event.key == pygame.K_RIGHT:
+            #    player1.move('right')
+            #if event.key == pygame.K_LEFT:
+            #    player1.move('left')
+            #if event.key == pygame.K_DOWN:
+            #    player1.move('down')
+            #if event.key == pygame.K_UP:
+            #    player1.move('up')
         elif event.type == pygame.MOUSEBUTTONDOWN:
             mouse = pygame.mouse.get_pos()
             x = mouse[0]//block_width
@@ -161,11 +194,14 @@ while not game_over:
                     Node_List.append([x,y])
                 if event.button == 1:
                     End_Index = Node_List.index([x,y])
-                elif event.button == 3:
-                    Start_Index = Node_List.index([x,y])
+                Start_Index = [player1.rect.x//block_width,player1.rect.y//block_width]
+                if Start not in Node_List:
+                    Node_list.append(Start)
+                Start_Index = Node_List.index(Start)
                 Connection_Dict = MazeGenerator.getConnections(Wall_List,Node_List)
                 Path_List = MazeGenerator.Dijkstra(Connection_Dict,Start_Index,End_Index)
                 generate_path(Path_List,block_width,Node_List)
+                follow_path(Path_List,block_width,Node_List)
             #endif
         #endif
     #next event
