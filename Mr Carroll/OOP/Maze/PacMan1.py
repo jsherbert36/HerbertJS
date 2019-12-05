@@ -127,11 +127,12 @@ Node_List = MazeGenerator.getNodes(Wall_List)
 pos = (Node_List[0][0]*block_width,Node_List[0][1]*block_width)
 currentplayer = Node_List[0]
 ghost1 = Ghost(block_width,pos)
+ghost_group.add(ghost1)
+all_sprites_group.add(ghost1)
 generate_wall(Wall_List,block_width)
 screen = pygame.display.set_mode(size)
 game_over = False
 clock = pygame.time.Clock()
-all_sprites_group.add(ghost1)
 player1 = Player(block_width,pos)
 all_sprites_group.add(player1)
 Temp_Node_List = []
@@ -176,7 +177,7 @@ while not game_over:
         player1.move('up')
 
     screen.fill(BLACK)
-    ghost1.update()
+    ghost_group.update()
     all_sprites_group.draw(screen)
     clock.tick(60)
     pygame.display.flip()
