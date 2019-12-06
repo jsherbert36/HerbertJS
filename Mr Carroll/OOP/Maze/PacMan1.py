@@ -15,6 +15,13 @@ def generate_wall(List,Dimension):
                 all_sprites_group.add(wall1)
         #next j
     #next i
+    right = [0,len(List)//2]
+    left = [len(List[0])-1,len(List)//2]
+    for block in wall_group:
+        if block.rect.collidepoint((0,right[1]*block_width)):
+            block.kill()
+        elif block.rect.collidepoint((left[0]*block_width,left[1]*block_width)):
+            block.kill()
 #end function
             
 class Wall(pygame.sprite.Sprite):
@@ -31,63 +38,48 @@ class Wall(pygame.sprite.Sprite):
 class Ghost(pygame.sprite.Sprite):
     def __init__(self,block_width,dimension):
         super().__init__()
-        self.width = block_width - 1
+        self.width = block_width - 6
         self.image = pygame.Surface([self.width, self.width])
         self.image.fill(RED)
         self.rect = self.image.get_rect()
         self.rect.y = dimension[1]
         self.rect.x = dimension[0]
-        self.speed = 1
-        self.direction = 'stop'
-        self.count = 0
+        self.speed = 1  
         self.node_queue = []
         self.next_node = None
 
     def update(self):
-        if self.direction == 'right': self.rect.x += self.speed
-        elif self.direction == 'left': self.rect.x -= self.speed
-        elif self.direction == 'up': self.rect.y -= self.speed
-        elif self.direction == 'down': self.rect.y += self.speed
-        if self.direction == 'stop' and self.node_queue:
+        if self.next_node == None and self.node_queue:
             self.next_node = self.node_queue.pop(0)
         if self.next_node != None:
-            Next_X = Node_List[self.next_node][0]
-            Next_Y = Node_List[self.next_node][1]
-            if self.direction == 'right':
-                Current_X = self.rect.left//block_width
-                Current_Y = self.rect.y//block_width
-            elif self.direction == 'left':
-                Current_X = self.rect.right//block_width
-                Current_Y = self.rect.y//block_width
-            elif self.direction == 'down':
-                Current_X = self.rect.x//block_width
-                Current_Y = self.rect.top//block_width
-            elif self.direction == 'up': 
-                Current_X = self.rect.x//block_width
-                Current_Y = self.rect.bottom//block_width
-            else:
-                Current_X = self.rect.x//block_width
-                Current_Y = self.rect.y//block_width
+            Next_X = (Node_List[self.next_node][0] * block_width) + (block_width//2)
+            Next_Y = (Node_List[self.next_node][1] * block_width) + (block_width//2)
+            Current_X = self.rect.centerx
+            Current_Y = self.rect.centery
             if Current_X < Next_X:
-                self.direction = 'right'
-            elif Current_X > Next_X:
-                self.direction = 'left'
-            elif Current_Y > Next_Y:
-                self.direction = 'up'
-            elif Current_Y < Next_Y:
-                self.direction = 'down'
+                 self.rect.x += self.speed
+            if Current_X > Next_X:
+                self.rect.x -= self.speed
+            if Current_Y > Next_Y:
+                self.rect.y -= self.speed
+            if Current_Y < Next_Y:
+                self.rect.y += self.speed
             if Next_X == Current_X and Next_Y == Current_Y:
-                self.direction = 'stop'
+                if self.node_queue:
+                    self.next_node = self.node_queue.pop(0)
+                else:
+                    self.next_node = None
+
     def move(self,Path_List):
-        self.direction = 'stop'
         self.node_queue = Path_List[1:]
 
 class Player(pygame.sprite.Sprite):
     def __init__(self,block_width,dimension):
         super().__init__()
-        self.width = block_width - 3
-        self.image = pygame.Surface([self.width, self.width])
-        self.image.fill(YELLOW)
+        self.width = block_width - 8
+        self.image = pygame.image.load("Circle.jpg").convert()
+        self.image = pygame.transform.smoothscale(self.image, (self.width,self.width))
+        self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
         self.rect.y = dimension[1]
         self.rect.x = dimension[0]
