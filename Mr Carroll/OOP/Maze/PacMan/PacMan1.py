@@ -58,8 +58,8 @@ class Ghost(pygame.sprite.Sprite):
     def __init__(self,block_width,dimension):
         super().__init__()
         self.width = block_width - 6
-        self.image = pygame.Surface([self.width, self.width])
-        self.image.fill(RED)
+        self.image = pygame.image.load(os.path.join(SCRIPT_PATH,"images","ghost.gif")).convert()
+        self.image = pygame.transform.smoothscale(self.image, (self.width,self.width))
         self.rect = self.image.get_rect()
         self.rect.y = dimension[1]
         self.rect.x = dimension[0]
@@ -96,25 +96,65 @@ class Player(pygame.sprite.Sprite):
     def __init__(self,block_width,dimension):
         super().__init__()
         self.width = block_width - 8
-        self.image = pygame.image.load(os.path.join(SCRIPT_PATH,"images","pacman.gif")).convert()
+        self.stop_im = pygame.image.load(os.path.join(SCRIPT_PATH,"images","pacman.gif")).convert()
+        self.image = self.stop_im
         self.image = pygame.transform.smoothscale(self.image, (self.width,self.width))
         self.up_im = []
-        for i in range(1,7):
+        self.down_im = []
+        self.right_im = []
+        self.left_im = []
+        self.direction = 'stop'
+        for i in range(1,9):
             self.up_im.append(pygame.image.load(os.path.join(SCRIPT_PATH,"images","pacman-u " + str(i) + ".gif")).convert())
+        for i in range(1,9):
+            self.down_im.append(pygame.image.load(os.path.join(SCRIPT_PATH,"images","pacman-d " + str(i) + ".gif")).convert())
+        for i in range(1,9):
+            self.right_im.append(pygame.image.load(os.path.join(SCRIPT_PATH,"images","pacman-r " + str(i) + ".gif")).convert())
+        for i in range(1,9):
+            self.left_im.append(pygame.image.load(os.path.join(SCRIPT_PATH,"images","pacman-l " + str(i) + ".gif")).convert())
         self.rect = self.image.get_rect()
         self.rect.y = dimension[1]
         self.rect.x = dimension[0]
         self.speed = 3
+        self.count = 0
     def update(self):
+        if self.count > 7:
+            self.count = 0
         if self.rect.x > size[0] - 20:
             self.rect.x = size[0] - 20
         elif self.rect.x < 0:
             self.rect.x = 0
+        if self.direction == 'up':
+            self.image = self.up_im[self.count]
+            self.image = pygame.transform.smoothscale(self.image, (self.width,self.width))
+        elif self.direction == 'down':
+            self.image = self.down_im[self.count]
+            self.image = pygame.transform.smoothscale(self.image, (self.width,self.width))
+        elif self.direction == 'right':
+            self.image = self.right_im[self.count]
+            self.image = pygame.transform.smoothscale(self.image, (self.width,self.width))
+        elif self.direction == 'left':
+            self.image = self.left_im[self.count]
+            self.image = pygame.transform.smoothscale(self.image, (self.width,self.width))
+        elif self.direction == 'stop':
+            self.image = self.stop_im
+            self.image = pygame.transform.smoothscale(self.image, (self.width,self.width))
+        self.count += 1
+
+        
     def move(self,val):
-        if val == 'right': self.rect.x += self.speed
-        elif val == 'left': self.rect.x -= self.speed
-        elif val == 'up': self.rect.y -= self.speed
-        elif val == 'down': self.rect.y += self.speed
+        if val == 'right':
+            self.rect.x += self.speed
+            self.direction = 'right'
+        elif val == 'left':
+            self.rect.x -= self.speed
+            self.direction = 'left'
+        elif val == 'up':
+            self.rect.y -= self.speed
+            self.direction = 'up'
+        elif val == 'down':
+            self.rect.y += self.speed
+            self.direction = 'down'
         wall_hit_group = pygame.sprite.spritecollide(self, wall_group, False)
         for block in wall_hit_group:
             if val == 'right': self.rect.right = block.rect.left
@@ -130,9 +170,10 @@ pygame.init()
 x = 700 - (700 % block_width)
 y = 700 - (700 % block_width)
 size = (x,y)
+screen = pygame.display.set_mode(size)
 maze_x = size[0]//block_width
 maze_y = size[1]//block_width
-Wall_List = FileIO.input_list('PacMan-Maze.json')
+Wall_List = FileIO.input_list(os.path.join(SCRIPT_PATH,'PacMan-Maze.json'))
 wall_group = pygame.sprite.Group()
 ghost_group = pygame.sprite.Group()
 all_sprites_group = pygame.sprite.Group()
@@ -143,7 +184,6 @@ ghost1 = Ghost(block_width,temp)
 ghost_group.add(ghost1)
 all_sprites_group.add(ghost1)
 left_portal,right_portal = generate_wall(Wall_List,block_width)
-screen = pygame.display.set_mode(size)
 game_over = False
 clock = pygame.time.Clock()
 temp = random_place()
@@ -188,8 +228,9 @@ while not game_over:
         portal_active = True
     if not pygame.sprite.collide_rect(player1,left_portal) and not pygame.sprite.collide_rect(player1,left_portal):
         portal_active = False
+    if pygame.sprite.collide_rect(player1,ghost1):
+        game_over = True
         
-            
     keys = pygame.key.get_pressed()
     if keys[pygame.K_RIGHT]:
         player1.move('right')
@@ -199,9 +240,12 @@ while not game_over:
         player1.move('down')
     elif keys[pygame.K_UP]:
         player1.move('up')
+    else:
+        player1.direction = 'stop'
 
     screen.fill(BLACK)
     ghost_group.update()
+    player1.update()
     all_sprites_group.draw(screen)
     clock.tick(60)
     pygame.display.flip()
