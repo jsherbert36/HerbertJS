@@ -3,10 +3,44 @@ BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 GREEN = (0, 255, 0)
 BLUE = (0,0,255)
-RED = (255, 0, 0)
+RED = (204, 0, 0)
 YELLOW = (230,230,0)
 SCRIPT_PATH = sys.path[0]
 
+def Menu(screen):
+    font = pygame.font.Font('freesansbold.ttf', 80) 
+    PlayColour = YELLOW
+    CenterX = 350
+    CenterY = 350
+    game_over = False
+    while not game_over:
+        screen.fill(BLACK) 
+        Logo = pygame.image.load(os.path.join(SCRIPT_PATH,"images","logo.gif")).convert()
+        Logo = pygame.transform.smoothscale(Logo, (400,70))
+        LogoRect = Logo.get_rect()
+        LogoRect.center = (CenterX, CenterY - 100) 
+        screen.blit(Logo, LogoRect) 
+        Play = font.render('PLAY', True, PlayColour)
+        PlayRect = Play.get_rect()
+        PlayRect.center = (CenterX, CenterY)
+        screen.blit(Play, PlayRect) 
+        mouse = pygame.mouse.get_pos()
+        if PlayRect.collidepoint(mouse): PlayColour = BLUE
+        else: PlayColour = YELLOW
+        pygame.display.flip()
+        for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    game_over = True
+                    return 'gameover'
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        game_over = True
+                        return 'gameover'
+                elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                    if PlayRect.collidepoint(mouse):
+                        return 'play'    
+        clock.tick(60)
+        
 def move_ghost(ghost,dimension):
     if dimension not in Node_List:
         Node_List.append(dimension)
@@ -23,7 +57,8 @@ def move_ghost(ghost,dimension):
     ghost.move(Path_List)
 
 def random_place():
-    Random_Node = random.choice(Node_List)
+    Cage_List = [[10,11],[11,11],[12,11]]
+    Random_Node = random.choice(Cage_List)
     return(Random_Node[0]*block_width,Random_Node[1]*block_width)
 
 def generate_wall(List,Dimension):
@@ -68,8 +103,21 @@ class Portal(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.y = dimension[1]
         self.rect.x = dimension[0]
-
 #end class
+
+class Gate(Wall):
+    def __init__(self,block_width,dimension):
+        super().__init__(dimension,block_width,BLACK)
+        self.cage = pygame.Surface([3*block_width,block_width])
+        self.cage_rect = self.cage.get_rect()
+        self.cage_rect.topleft = (11*block_width,11*block_width)
+    def update(self):
+        if pygame.sprite.spritecollide(self,ghost_group, False):
+            self.colour = BLACK
+        else: self.colour = BLUE
+        for ghost in ghost_group:
+            if self.cage_rect.collidepoint(ghost.rect.center):
+                self.colour = BLACK
         
 class Ghost(pygame.sprite.Sprite):
     def __init__(self,block_width,dimension,name):
@@ -225,6 +273,7 @@ ghost_group = pygame.sprite.Group()
 all_sprites_group = pygame.sprite.Group()
 Node_List = MazeGenerator.getNodes(Wall_List)
 currentplayer = Node_List[0]
+gate = Gate(block_width,((11*block_width),(10*block_width)))
 temp = random_place()
 blinky = Ghost(block_width,temp,'blinky')
 temp = random_place()
@@ -234,18 +283,24 @@ pinky = Ghost(block_width,temp,'pinky')
 temp = random_place()
 sue = Ghost(block_width,temp,'sue')
 ghost_group.add(blinky,inky,pinky,sue)
-all_sprites_group.add(blinky,inky,pinky,sue)
+all_sprites_group.add(blinky,inky,pinky,sue,gate)
 left_portal,right_portal = generate_wall(Wall_List,block_width)
 all_sprites_group.add(left_portal,right_portal)
 game_over = False
 clock = pygame.time.Clock()
-temp = random_place()
+Random_Node = random.choice(Node_List)
+temp = (Random_Node[0]*block_width,Random_Node[1]*block_width)
 pacman = Player(block_width,temp)
 all_sprites_group.add(pacman)
 Temp_Node_List = []
 portal_active = True
+start_menu = Menu(screen)
+if start_menu == 'gameover': game_over = True
+count = 0
 # -------- Main Program Loop ----------- #
 while not game_over:
+    count += 1
+    print(count)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             game_over = True
@@ -267,7 +322,7 @@ while not game_over:
         else:
             inky_x = x
             inky_y = y
-        move_ghost(inky,[inky_x,inky_y])
+        if count > 150: move_ghost(inky,[inky_x,inky_y])
         if pacman.direction == 'up':
             pinky_x = x
             if pacman.rect.y > block_width + 100:
@@ -295,8 +350,8 @@ while not game_over:
         else:
             pinky_x = x
             pinky_y = y
-        move_ghost(pinky,[pinky_x,pinky_y])
-        move_ghost(sue,random.choice(Node_List))
+        if count > 400: move_ghost(pinky,[pinky_x,pinky_y])
+        if count % 300 == 0: move_ghost(sue,random.choice(Node_List))
         
 
     if pygame.sprite.collide_rect(pacman, right_portal) and portal_active == False:
