@@ -129,7 +129,7 @@ def Dijkstra(graph,start_node,end_node):
     current_node = end_node
     while current_node != start_node:
         Path.insert(0,current_node)
-        current_node = previous[current_node]  
+        current_node = previous[current_node]
     Path.insert(0,start_node)
     if shortest_distance[end_node] != math.inf:
         return Path

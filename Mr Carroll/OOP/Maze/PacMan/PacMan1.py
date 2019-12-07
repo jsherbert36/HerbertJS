@@ -1,4 +1,4 @@
-import pygame,random,sys,FileIO,MazeGenerator,random,os
+import pygame,random,sys,FileIO,MazeGenerator,random,os,math
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 GREEN = (0, 255, 0)
@@ -6,6 +6,21 @@ BLUE = (0,0,255)
 RED = (255, 0, 0)
 YELLOW = (230,230,0)
 SCRIPT_PATH = sys.path[0]
+
+def move_ghost(ghost,dimension):
+    if dimension not in Node_List:
+        Node_List.append(dimension)
+    End_Index = Node_List.index(dimension)
+    Start = [ghost.rect.x//block_width,ghost.rect.y//block_width]
+    if Start not in Node_List:
+        Node_List.append(Start)
+    Start_Index = Node_List.index(Start)
+    Connection_Dict = MazeGenerator.getConnections(Wall_List,Node_List)
+    try:
+        Path_List = MazeGenerator.Dijkstra(Connection_Dict,Start_Index,End_Index)
+    except:
+        Path_List = []
+    ghost.move(Path_List)
 
 def random_place():
     Random_Node = random.choice(Node_List)
@@ -47,7 +62,9 @@ class Wall(pygame.sprite.Sprite):
 class Portal(pygame.sprite.Sprite):
     def __init__(self,block_width,dimension):
         super().__init__()
-        self.image = pygame.Surface([block_width, block_width])
+        self.width = block_width
+        self.image = pygame.image.load(os.path.join(SCRIPT_PATH,"images","portal.png")).convert()
+        self.image = pygame.transform.smoothscale(self.image, (self.width,self.width))
         self.rect = self.image.get_rect()
         self.rect.y = dimension[1]
         self.rect.x = dimension[0]
@@ -55,10 +72,11 @@ class Portal(pygame.sprite.Sprite):
 #end class
         
 class Ghost(pygame.sprite.Sprite):
-    def __init__(self,block_width,dimension):
+    def __init__(self,block_width,dimension,name):
         super().__init__()
+        self.name = name
         self.width = block_width - 6
-        self.image = pygame.image.load(os.path.join(SCRIPT_PATH,"images","ghost.gif")).convert()
+        self.image = pygame.image.load(os.path.join(SCRIPT_PATH,"images",name+".gif")).convert()
         self.image = pygame.transform.smoothscale(self.image, (self.width,self.width))
         self.rect = self.image.get_rect()
         self.rect.y = dimension[1]
@@ -95,10 +113,13 @@ class Ghost(pygame.sprite.Sprite):
 class Player(pygame.sprite.Sprite):
     def __init__(self,block_width,dimension):
         super().__init__()
-        self.width = block_width - 8
+        self.width = block_width - 6
         self.stop_im = pygame.image.load(os.path.join(SCRIPT_PATH,"images","pacman.gif")).convert()
         self.image = self.stop_im
         self.image = pygame.transform.smoothscale(self.image, (self.width,self.width))
+        self.next_x = None
+        self.next_y = None
+        self.next = None
         self.up_im = []
         self.down_im = []
         self.right_im = []
@@ -115,55 +136,80 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.y = dimension[1]
         self.rect.x = dimension[0]
-        self.speed = 3
+        self.speed = 2
         self.count = 0
+
     def update(self):
-        if self.count > 7:
+        if self.count > 14:
             self.count = 0
-        if self.rect.x > size[0] - 20:
-            self.rect.x = size[0] - 20
-        elif self.rect.x < 0:
-            self.rect.x = 0
         if self.direction == 'up':
-            self.image = self.up_im[self.count]
+            self.image = self.up_im[self.count//2]
             self.image = pygame.transform.smoothscale(self.image, (self.width,self.width))
+            self.rect.y -= self.speed
+            self.next_y = self.rect.bottom//block_width
+            self.next_x = self.rect.x//block_width
         elif self.direction == 'down':
-            self.image = self.down_im[self.count]
+            self.image = self.down_im[self.count//2]
             self.image = pygame.transform.smoothscale(self.image, (self.width,self.width))
+            self.rect.y += self.speed
+            self.next_y = self.rect.top//block_width
+            self.next_x = self.rect.x//block_width
         elif self.direction == 'right':
-            self.image = self.right_im[self.count]
+            self.image = self.right_im[self.count//2]
             self.image = pygame.transform.smoothscale(self.image, (self.width,self.width))
+            self.rect.x += self.speed
+            self.next_x = self.rect.left//block_width
+            self.next_y = self.rect.y//block_width
         elif self.direction == 'left':
-            self.image = self.left_im[self.count]
+            self.image = self.left_im[self.count//2]
             self.image = pygame.transform.smoothscale(self.image, (self.width,self.width))
+            self.rect.x -= self.speed
+            self.next_x = self.rect.right//block_width
+            self.next_y = self.rect.y//block_width
         elif self.direction == 'stop':
             self.image = self.stop_im
             self.image = pygame.transform.smoothscale(self.image, (self.width,self.width))
+            self.next_x = self.rect.x//block_width
+            self.next_y = self.rect.y//block_width
         self.count += 1
-
-        
-    def move(self,val):
-        if val == 'right':
-            self.rect.x += self.speed
-            self.direction = 'right'
-        elif val == 'left':
-            self.rect.x -= self.speed
-            self.direction = 'left'
-        elif val == 'up':
-            self.rect.y -= self.speed
-            self.direction = 'up'
-        elif val == 'down':
-            self.rect.y += self.speed
-            self.direction = 'down'
         wall_hit_group = pygame.sprite.spritecollide(self, wall_group, False)
         for block in wall_hit_group:
-            if val == 'right': self.rect.right = block.rect.left
-            elif val == 'left': self.rect.left = block.rect.right
-            elif val == 'down': self.rect.bottom = block.rect.top
-            elif val == 'up': self.rect.top = block.rect.bottom
-
-
-
+            if self.direction == 'right':
+                self.rect.right = block.rect.left
+            elif self.direction == 'left':
+                self.rect.left = block.rect.right
+            elif self.direction == 'down':
+                self.rect.bottom = block.rect.top
+            elif self.direction == 'up':
+                self.rect.top = block.rect.bottom
+            if self.next != None:
+                self.direction = self.next
+                self.next = None
+            else:
+                self.direction = 'stop'
+        if self.next != None:
+            if self.next == 'right':
+                if Wall_List[self.next_y][self.next_x+1] == 0:
+                    self.direction = 'right'
+                    self.next = None
+            elif self.next == 'left':
+                if Wall_List[self.next_y][self.next_x-1] == 0:
+                    self.direction = 'left'
+                    self.next = None
+            elif self.next == 'up':
+                if Wall_List[self.next_y-1][self.next_x] == 0:
+                    self.direction = 'up'
+                    self.next = None
+            elif self.next == 'down':
+                if Wall_List[self.next_y+1][self.next_x] == 0:
+                    self.direction = 'down'
+                    self.next = None
+            
+    def move(self,val):
+        if self.next == None:
+            self.next = val
+        
+        
 # Initialize Pygame
 block_width = 30
 pygame.init()
@@ -180,15 +226,22 @@ all_sprites_group = pygame.sprite.Group()
 Node_List = MazeGenerator.getNodes(Wall_List)
 currentplayer = Node_List[0]
 temp = random_place()
-ghost1 = Ghost(block_width,temp)
-ghost_group.add(ghost1)
-all_sprites_group.add(ghost1)
+blinky = Ghost(block_width,temp,'blinky')
+temp = random_place()
+inky = Ghost(block_width,temp,'inky')
+temp = random_place()
+pinky = Ghost(block_width,temp,'pinky')
+temp = random_place()
+sue = Ghost(block_width,temp,'sue')
+ghost_group.add(blinky,inky,pinky,sue)
+all_sprites_group.add(blinky,inky,pinky,sue)
 left_portal,right_portal = generate_wall(Wall_List,block_width)
+all_sprites_group.add(left_portal,right_portal)
 game_over = False
 clock = pygame.time.Clock()
 temp = random_place()
-player1 = Player(block_width,temp)
-all_sprites_group.add(player1)
+pacman = Player(block_width,temp)
+all_sprites_group.add(pacman)
 Temp_Node_List = []
 portal_active = True
 # -------- Main Program Loop ----------- #
@@ -200,52 +253,76 @@ while not game_over:
             if event.key == pygame.K_ESCAPE:
                 game_over = True
         
-    x = player1.rect.x//block_width
-    y = player1.rect.y//block_width
+    x = pacman.rect.centerx//block_width
+    y = pacman.rect.centery//block_width
     if currentplayer != [x,y]:
         currentplayer = [x,y]
-        for i in Temp_Node_List:
-            index = Node_List.index(i)
-            del Node_List[index]
-        Temp_Node_List = []
-        if currentplayer not in Node_List:
-            Node_List.append(currentplayer)
-            Temp_Node_List.append(currentplayer)
-        End_Index = Node_List.index(currentplayer)
-        Start = [ghost1.rect.x//block_width,ghost1.rect.y//block_width]
-        if Start not in Node_List:
-            Node_List.append(Start)
-        Start_Index = Node_List.index(Start)
-        Connection_Dict = MazeGenerator.getConnections(Wall_List,Node_List)
-        Path_List = MazeGenerator.Dijkstra(Connection_Dict,Start_Index,End_Index)
-        ghost1.move(Path_List)
+        move_ghost(blinky,currentplayer)
+        if math.hypot(abs(pacman.rect.x - left_portal.rect.x), abs(pacman.rect.y - left_portal.rect.y)) < 150:
+            inky_x = (right_portal.rect.x - 100)//block_width
+            inky_y = (right_portal.rect.y//block_width)
+        elif math.hypot(abs(pacman.rect.x - right_portal.rect.x), abs(pacman.rect.y - right_portal.rect.y)) < 150:
+            inky_x = (left_portal.rect.x + 100)//block_width
+            inky_y = (left_portal.rect.y//block_width)
+        else:
+            inky_x = x
+            inky_y = y
+        move_ghost(inky,[inky_x,inky_y])
+        if pacman.direction == 'up':
+            pinky_x = x
+            if pacman.rect.y > block_width + 100:
+                pinky_y = (pacman.rect.y - 100)//block_width
+            else:
+                pinky_y = y
+        elif pacman.direction == 'down':
+            pinky_x = x
+            if pacman.rect.y < size[1] - block_width - 100:
+                pinky_y = (pacman.rect.y + 100)//block_width
+            else:
+                pinky_y = y
+        elif pacman.direction == 'right':
+            if pacman.rect.x < size[0]-100-block_width:
+                pinky_x = (pacman.rect.x + 100)//block_width
+            else:
+                pinky_x = x
+            pinky_y = y
+        elif pacman.direction == 'left':
+            if pacman.rect.x > block_width + 100:
+                pinky_x = (pacman.rect.x - 100)//block_width
+            else:
+                pinky_x = x
+            pinky_y = y
+        else:
+            pinky_x = x
+            pinky_y = y
+        move_ghost(pinky,[pinky_x,pinky_y])
+        move_ghost(sue,random.choice(Node_List))
+        
 
-    if pygame.sprite.collide_rect(player1, right_portal) and portal_active == False:
-        player1.rect.left = left_portal.rect.right
+    if pygame.sprite.collide_rect(pacman, right_portal) and portal_active == False:
+        pacman.rect.left = left_portal.rect.right
         portal_active = True
-    elif pygame.sprite.collide_rect(player1, left_portal) and portal_active == False:
-        player1.rect.right = right_portal.rect.left
+    elif pygame.sprite.collide_rect(pacman, left_portal) and portal_active == False:
+        pacman.rect.right = right_portal.rect.left
         portal_active = True
-    if not pygame.sprite.collide_rect(player1,left_portal) and not pygame.sprite.collide_rect(player1,left_portal):
+    if not pygame.sprite.collide_rect(pacman,left_portal) and not pygame.sprite.collide_rect(pacman,left_portal):
         portal_active = False
-    if pygame.sprite.collide_rect(player1,ghost1):
+    if pygame.sprite.spritecollide(pacman,ghost_group,False):
         game_over = True
         
     keys = pygame.key.get_pressed()
     if keys[pygame.K_RIGHT]:
-        player1.move('right')
+        pacman.move('right')
     elif keys[pygame.K_LEFT]:
-        player1.move('left')
+        pacman.move('left')
     elif keys[pygame.K_DOWN]:
-        player1.move('down')
+        pacman.move('down')
     elif keys[pygame.K_UP]:
-        player1.move('up')
-    else:
-        player1.direction = 'stop'
+        pacman.move('up')
 
     screen.fill(BLACK)
     ghost_group.update()
-    player1.update()
+    pacman.update()
     all_sprites_group.draw(screen)
     clock.tick(60)
     pygame.display.flip()
