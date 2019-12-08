@@ -1,4 +1,4 @@
-import numpy,FileIO,math,heapq,sys
+import numpy,math,heapq,sys
 from numpy.random import randint as rand
 
 def generate(width=81, height=51, complexity=.75, density=.75):
