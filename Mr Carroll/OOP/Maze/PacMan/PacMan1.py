@@ -254,6 +254,7 @@ maze_y = size[1]//block_width
 f = open(os.path.join(SCRIPT_PATH,'PacMan-Maze.json'),"rt")
 Wall_List = json.load(f)
 f.close()
+temp_node_list = []
 wall_group = pygame.sprite.Group()
 ghost_group = pygame.sprite.Group()
 all_sprites_group = pygame.sprite.Group()
