@@ -170,7 +170,7 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.y = dimension[1]
         self.rect.x = dimension[0]
-        self.speed = 1
+        self.speed = 2
         self.count = 0
 
     def update(self):
@@ -408,7 +408,7 @@ while not game_over:
     ghost_group.update()
     pacman.update()
     all_sprites_group.draw(screen)
-    clock.tick(100)
+    clock.tick(60)
     pygame.display.flip()
  
 pygame.quit()
