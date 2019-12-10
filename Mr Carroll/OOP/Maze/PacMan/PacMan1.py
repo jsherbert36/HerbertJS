@@ -44,10 +44,12 @@ def Menu(screen):
 def move_ghost(ghost,dimension):
     if dimension not in Node_List:
         Node_List.append(dimension)
+        print('new end node')
     End_Index = Node_List.index(dimension)
     Start = [ghost.rect.x//block_width,ghost.rect.y//block_width]
     if Start not in Node_List:
         Node_List.append(Start)
+        print('new start node')
     Start_Index = Node_List.index(Start)
     Connection_Dict = MazeGenerator.getConnections(Wall_List,Node_List)
     try:
@@ -170,7 +172,7 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.y = dimension[1]
         self.rect.x = dimension[0]
-        self.speed = 2
+        self.speed = 1
         self.count = 0
 
     def update(self):
@@ -249,6 +251,7 @@ x = 700 - (700 % block_width)
 y = 700 - (700 % block_width)
 size = (x,y)
 screen = pygame.display.set_mode(size)
+pygame.display.set_caption('PACMAN')
 maze_x = size[0]//block_width
 maze_y = size[1]//block_width
 
@@ -293,7 +296,7 @@ cage = pygame.Surface([3*block_width,block_width])
 cage_rect = cage.get_rect()
 cage_rect.topleft = (10*block_width,11*block_width)
 Open = True
-ghost_mode = 'hunt'
+ghost_mode = 'scatter'
 ghost_mode_count = 0
 # -------- Main Program Loop ----------- #
 while not game_over:
@@ -316,7 +319,8 @@ while not game_over:
     y = pacman.rect.centery//block_width
     if currentplayer != [x,y] and ghost_mode == 'hunt':
         currentplayer = [x,y]
-        move_ghost(blinky,currentplayer)
+        Blinky_Start = [blinky.rect.x//block_width,blinky.rect.y//block_width]
+        if Blinky_Start in Node_List: move_ghost(blinky,currentplayer)
         if math.hypot(abs(pacman.rect.x - left_portal.rect.x), abs(pacman.rect.y - left_portal.rect.y)) < 150:
             inky_x = (right_portal.rect.x - 100)//block_width
             inky_y = (right_portal.rect.y//block_width)
@@ -326,7 +330,8 @@ while not game_over:
         else:
             inky_x = x
             inky_y = y
-        if count > 150: move_ghost(inky,[inky_x,inky_y])
+        Inky_Start = [inky.rect.x//block_width,inky.rect.y//block_width]
+        if Inky_Start in Node_List: move_ghost(inky,[inky_x,inky_y])
         if pacman.direction == 'up':
             pinky_x = x
             if pacman.rect.y > block_width + 130:
@@ -354,13 +359,16 @@ while not game_over:
         else:
             pinky_x = x
             pinky_y = y
-        if count > 400: move_ghost(pinky,[pinky_x,pinky_y])
+        Pinky_Start = [pinky.rect.x//block_width,pinky.rect.y//block_width]
+        if Pinky_Start in Node_List: move_ghost(pinky,[pinky_x,pinky_y])
         if sue.next_node == None: move_ghost(sue,random.choice(Node_List))
+
+
     elif ghost_mode == 'scatter':
         if sue.next_node == None: move_ghost(sue,random.choice(Node_List))
-        if pinky.next_node == None: move_ghost(pinky,random.choice(Node_List))
+        if pinky.next_node == None and count > 400: move_ghost(pinky,random.choice(Node_List))
         if blinky.next_node == None: move_ghost(blinky,random.choice(Node_List))
-        if inky.next_node == None: move_ghost(inky,random.choice(Node_List))
+        if inky.next_node == None and count > 150: move_ghost(inky,random.choice(Node_List))
 
         
 
@@ -414,7 +422,7 @@ while not game_over:
     ghost_group.update()
     pacman.update()
     all_sprites_group.draw(screen)
-    clock.tick(60)
+    clock.tick(150)
     pygame.display.flip()
  
 pygame.quit()

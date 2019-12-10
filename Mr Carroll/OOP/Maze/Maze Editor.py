@@ -41,6 +41,9 @@ while not game_over:
             elif event.key == pygame.K_SPACE:
                 FileIO.output_list(Wall_List)
                 game_over = True
+            elif event.key == pygame.K_x:
+                for block in wall_group:
+                    block.kill()
     if pygame.mouse.get_pressed()[0]:
         mouse = pygame.mouse.get_pos()
         x = mouse[0]//block_width
