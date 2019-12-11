@@ -41,10 +41,22 @@ def Menu(screen):
                         return 'play'    
         clock.tick(60)
         
+def addPoints(Number,block_width):
+    count = 0 
+    Points_List = []
+    while count < Number:
+        x = random.randint(1,len(Wall_List[0])-1)
+        y = random.randint(1,len(Wall_List)-1)
+        if Wall_List[y][x] == 0 and [x,y] not in Points_List:
+            Points_List.append([x,y])
+            point1 = Point(block_width, [x,y])
+            points_group.add(point1)
+            count += 1
+
 def move_ghost(ghost,dimension):
     if dimension not in Node_List:
         Node_List.append(dimension)
-        print('new end node')
+        print('end node')
     End_Index = Node_List.index(dimension)
     Start = [ghost.rect.x//block_width,ghost.rect.y//block_width]
     if Start not in Node_List:
@@ -95,6 +107,15 @@ class Wall(pygame.sprite.Sprite):
         self.rect.x = dimension[0]
     #end procedure
 #end class
+class Point(pygame.sprite.Sprite):
+    def __init__(self,block_width,coordinates):
+        super().__init__()
+        self.spacing = block_width//2
+        self.image = pygame.image.load(os.path.join(SCRIPT_PATH,"images","pacman.gif")).convert()
+        self.image = pygame.transform.smoothscale(self.image, (7,7))
+        self.rect = self.image.get_rect()
+        self.rect.centerx = coordinates[0]*block_width + self.spacing
+        self.rect.centery = coordinates[1]*block_width + self.spacing
 
 class Portal(pygame.sprite.Sprite):
     def __init__(self,block_width,dimension):
@@ -103,8 +124,8 @@ class Portal(pygame.sprite.Sprite):
         self.image = pygame.image.load(os.path.join(SCRIPT_PATH,"images","portal.png")).convert()
         self.image = pygame.transform.smoothscale(self.image, (self.width,self.width))
         self.rect = self.image.get_rect()
+        self.rect.x = dimension[0] 
         self.rect.y = dimension[1]
-        self.rect.x = dimension[0]
 #end class
         
 class Ghost(pygame.sprite.Sprite):
@@ -131,11 +152,11 @@ class Ghost(pygame.sprite.Sprite):
             Current_Y = self.rect.centery
             if Current_X < Next_X:
                  self.rect.x += self.speed
-            if Current_X > Next_X:
+            elif Current_X > Next_X:
                 self.rect.x -= self.speed
-            if Current_Y > Next_Y:
+            elif Current_Y > Next_Y:
                 self.rect.y -= self.speed
-            if Current_Y < Next_Y:
+            elif Current_Y < Next_Y:
                 self.rect.y += self.speed
             if Next_X == Current_X and Next_Y == Current_Y:
                 if self.node_queue:
@@ -254,18 +275,14 @@ screen = pygame.display.set_mode(size)
 pygame.display.set_caption('PACMAN')
 maze_x = size[0]//block_width
 maze_y = size[1]//block_width
-
-
-
 f = open(os.path.join(SCRIPT_PATH,'PacMan-Maze.json'),"rt")
 Wall_List = json.load(f)
 f.close()
-
-
-
 temp_node_list = []
 wall_group = pygame.sprite.Group()
 ghost_group = pygame.sprite.Group()
+points_group = pygame.sprite.Group()
+point_hit_group = pygame.sprite.Group()
 all_sprites_group = pygame.sprite.Group()
 Node_List = MazeGenerator.getNodes(Wall_List)
 currentplayer = Node_List[0]
@@ -297,7 +314,9 @@ cage_rect = cage.get_rect()
 cage_rect.topleft = (10*block_width,11*block_width)
 Open = True
 ghost_mode = 'scatter'
+addPoints(100,block_width)
 ghost_mode_count = 0
+score = 0
 # -------- Main Program Loop ----------- #
 while not game_over:
     count += 1
@@ -315,16 +334,16 @@ while not game_over:
         ghost_mode = 'hunt'
         ghost_mode_count = 0
         
-    x = pacman.rect.centerx//block_width
-    y = pacman.rect.centery//block_width
+    x = pacman.rect.x//block_width
+    y = pacman.rect.y//block_width
     if currentplayer != [x,y] and ghost_mode == 'hunt':
         currentplayer = [x,y]
         Blinky_Start = [blinky.rect.x//block_width,blinky.rect.y//block_width]
         if Blinky_Start in Node_List: move_ghost(blinky,currentplayer)
-        if math.hypot(abs(pacman.rect.x - left_portal.rect.x), abs(pacman.rect.y - left_portal.rect.y)) < 150:
+        if abs(currentplayer[0] - left_portal.rect.x) + abs(currentplayer[1] - left_portal.rect.y) < 150:
             inky_x = (right_portal.rect.x - 100)//block_width
             inky_y = (right_portal.rect.y//block_width)
-        elif math.hypot(abs(pacman.rect.x - right_portal.rect.x), abs(pacman.rect.y - right_portal.rect.y)) < 150:
+        elif abs(currentplayer[0] - right_portal.rect.x) + abs(currentplayer[1] - right_portal.rect.y) < 150:
             inky_x = (left_portal.rect.x + 100)//block_width
             inky_y = (left_portal.rect.y//block_width)
         else:
@@ -334,25 +353,25 @@ while not game_over:
         if Inky_Start in Node_List: move_ghost(inky,[inky_x,inky_y])
         if pacman.direction == 'up':
             pinky_x = x
-            if pacman.rect.y > block_width + 130:
-                pinky_y = (pacman.rect.y - 130)//block_width
+            if currentplayer[1] > block_width + 130:
+                pinky_y = (currentplayer[1] - 130)//block_width
             else:
                 pinky_y = y
         elif pacman.direction == 'down':
             pinky_x = x
-            if pacman.rect.y < size[1] - block_width - 130:
-                pinky_y = (pacman.rect.y + 130)//block_width
+            if currentplayer[1] < size[1] - block_width - 130:
+                pinky_y = (currentplayer[1] + 130)//block_width
             else:
                 pinky_y = y
         elif pacman.direction == 'right':
-            if pacman.rect.x < size[0]-130-block_width:
-                pinky_x = (pacman.rect.x + 130)//block_width
+            if currentplayer[0] < size[0]-130-block_width:
+                pinky_x = (currentplayer[0] + 130)//block_width
             else:
                 pinky_x = x
             pinky_y = y
         elif pacman.direction == 'left':
-            if pacman.rect.x > block_width + 130:
-                pinky_x = (pacman.rect.x - 130)//block_width
+            if currentplayer[0] > block_width + 130:
+                pinky_x = (currentplayer[0] - 130)//block_width
             else:
                 pinky_x = x
             pinky_y = y
@@ -382,6 +401,10 @@ while not game_over:
         portal_active = False
     if pygame.sprite.spritecollide(pacman,ghost_group,False):
         game_over = True
+
+    point_hit_group = pygame.sprite.spritecollide(pacman,points_group,True)
+    for point in point_hit_group:
+        score += 1
 
     if Open == False:
         collide = False
@@ -421,8 +444,9 @@ while not game_over:
     screen.fill(BLACK)
     ghost_group.update()
     pacman.update()
+    points_group.draw(screen)
     all_sprites_group.draw(screen)
-    clock.tick(150)
+    clock.tick(100)
     pygame.display.flip()
  
 pygame.quit()
