@@ -314,7 +314,7 @@ cage_rect = cage.get_rect()
 cage_rect.topleft = (10*block_width,11*block_width)
 Open = True
 ghost_mode = 'scatter'
-addPoints(100,block_width)
+#addPoints(100,block_width)
 ghost_mode_count = 0
 score = 0
 # -------- Main Program Loop ----------- #
