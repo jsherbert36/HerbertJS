@@ -13,8 +13,7 @@ def generate_wall(List,Dimension):
                 wall_group.add(wall1)
                 all_sprites_group.add(wall1)
         #next j
-    #next i
-#end function
+#end procedure
 
 def generate_path(Path_List,Dimension,Node_List):
     for block in path_group:
@@ -31,8 +30,8 @@ def generate_path(Path_List,Dimension,Node_List):
             path1 = Wall(((x*Dimension),(y*Dimension)),Dimension,BLUE)
             path_group.add(path1)
         #next j
-    #next i
-#end function
+    #nexti
+#end procedure
     
 class Wall(pygame.sprite.Sprite):
     def __init__(self,dimension,block_width,colour = WHITE):
