@@ -1,6 +1,6 @@
 ### SRC - This is a great effort. I look forward to seeing the OOP version
 from FileIO import read_text,output_text
-
+#accurate rotors
 def Rotor(RotorNum,Character,Direction):   #Rotors are accurate to German WWII specs
 	RotorPatterns = [[['A','E'],['B','K'],['C','M'],['D','F'],['E','L'],['F','G'],        #Rotor I 
 		            ['G','D'],['H','Q'],['I','V'],['J','Z'],['K','N'],['L','T'],
