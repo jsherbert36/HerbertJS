@@ -1,4 +1,4 @@
-import FileIO,random,time,sys,os
+import random,time,sys,os,json
 def insertionsort(num_list):
     for i in range(1,len(num_list)):
         next = num_list[i]
@@ -147,11 +147,12 @@ if __name__ == "__main__":
         else:
             print('Invalid Input')
             time.sleep(20)
+        os.system('cls' if os.name == 'nt' else 'clear')
+        output_list(new_list)
     else:
         print('List is already sorted')
         time.sleep(5)
-    os.system('cls' if os.name == 'nt' else 'clear')
-    output_list(new_list)
+    
 
 
 
