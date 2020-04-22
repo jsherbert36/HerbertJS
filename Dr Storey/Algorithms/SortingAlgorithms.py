@@ -97,10 +97,30 @@ def JacobSort(num_list):
     final = merge(List,Rest)
     return final
 
+def input_list(name = ''):
+    finish = False
+    while finish == False:
+        if name == '':
+            file = input("Please enter the input file name i.e input.json: ")
+        else:
+            file = str(name)
+        try:
+            f = open(file,"rt")
+            finish = True
+        except FileNotFoundError:
+            print('File not found - try again')
+            name = ''
+    return (json.load(f))
+    f.close()
 
+def output_list(List):
+    file = input("Please enter the .json output file name: ")    
+    f = open(file,"wt")        
+    json.dump(List, f)
+    f.close()
 
-def driver_code():
-    arr = FileIO.input_list()
+if __name__ == "__main__":
+    arr = input_list()
     assert type(arr) == list
     os.system('cls' if os.name == 'nt' else 'clear')
     print('Choose which sorting algorithm to use:\n',
@@ -131,8 +151,7 @@ def driver_code():
         print('List is already sorted')
         time.sleep(5)
     os.system('cls' if os.name == 'nt' else 'clear')
-    FileIO.output_list(new_list)
+    output_list(new_list)
 
-driver_code()
 
 
