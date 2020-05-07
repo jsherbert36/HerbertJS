@@ -16,24 +16,34 @@ def bubblesort(List):
                 List[j], List[j+1] = List[j+1],List[j]
     return List
 
-def quicksort(List,low = 0,high = ''):
-    if high == '':
-        high = len(List) - 1
-    if low < high:
-        Q,List = partition(List,low,high)
-        quicksort(List,low,Q-1)
-        quicksort(List,Q+1,high)
-    return List
+def swap(j,p,list):
+    temp = list[p]
+    list[p] = list[j]
+    list[j] = temp
+    return p,j,list
 
-def partition(List,low,high):
-    pivot = List[high]
-    i = low 
-    for j in range(low,high):
-        if List[j] <= pivot:
-            List[i],List[j] = List[j],List[i]
-            i += 1
-    List[i],List[high] = List[high],List[i]
-    return i,List
+def partition(list):
+    p = 0
+    j = len(list) -1
+    while j != p:
+        if j > p:
+            if list[j] < list[p]:
+                j,p,list = swap(j,p,list)
+                j+=2
+            j-=1
+        elif j < p:
+            if list[j] > list[p]:
+                j,p,list = swap(j,p,list)
+                j-=2
+            j+=1
+    return j,list
+  
+def quicksort(list):
+    if len(list) > 1:
+        P,list = partition(list) 
+        return quicksort(list[:P]) + [list[P]] + quicksort(list[P+1:]) 
+    else:
+        return list
 
 def mergesort(List):
     n = len(List)
